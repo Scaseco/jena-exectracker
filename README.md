@@ -77,8 +77,45 @@ PREFIX jetf:      <https://w3id.org/aksw/jena/exectracker/fuseki#>
 
 Terminology note: We use `fuseki-mod` to refer to the development artifact. The `fuseki-plugin` is the *packaging* of the `fueski-mod` as a drop-in JAR file.
 
+## Programmatic Usage
 
-### Build from Source
+```java
+public class ExampleExecTracker {
+    static { JenaSystem.init(); }
+
+    public static void main(String[] args) {
+        // These following registrations happen automagically in JenaPluginExecTracker:
+        // QueryEngineRegistry.get().add(new QueryEngineFactoryExecTracker());
+        // UpdateEngineRegistry.get().add(new UpdateEngineFactoryExecTracker());
+
+        // The aforementioned registration check intercept query and update
+        // executions and check for whether there is a broker in the context.
+        // A broker is both an event listener and an event source - i.e. it is an
+        // event distributor.
+        // If so, the broker is notified of the execution.
+        TaskEventBroker broker = TaskEventBroker.getOrCreate(ARQ.getContext());
+        
+        // The history broker is broker that in addition saves the last n seen events.
+        TaskEventHistory history = TaskEventHistory.getOrCreate(ARQ.getContext());
+        history.connect(broker);
+
+        DatasetGraph dsg = DatasetGraphFactory.create();
+
+        UpdateExec.dataset(dsg).update("PREFIX eg: <http://www.example.org/> INSERT DATA { eg:s eg:p eg:o }").execute();
+
+        Table table = QueryExec.dataset(dsg).query("SELECT * { ?s ?p ?o }").table();
+        RowSetOps.out(table.toRowSet());
+
+        System.out.println(history);
+        // This will print out:
+        // Active: 0, History: 2/1000
+        // It means: no running executions, 2 completed ones,
+        // and 1000 is the maximum history size (oldest entry becomes discarded first).
+    }
+}
+```
+
+## Build from Source
 
 For convenience, a self-describing `Makefile` is provided:
 
