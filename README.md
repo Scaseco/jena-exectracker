@@ -5,6 +5,9 @@
 
 SPARQL Execution Tracking for Apache Jena via interception at `QueryEngineRegistry` and `UpdateEngineRegistry`.
 
+![Fuseki ExecTracker Services](docs/images/fuseki-exectracker-services.png)
+![Fuseki ExecTracker Dashboard](docs/images/fuseki-exectracker-dashboard.png)
+
 ## Fuseki Plugin
 
 The Fuseki Plugin is published with releases: [Latest Release](/releases/latest).
@@ -37,19 +40,22 @@ PREFIX jetf:      <https://w3id.org/aksw/jena/exectracker/fuseki#>
     fuseki:allowedUsers "test" ;
   ] ;
 
-  # Public endpoint where users can view − but not abort − SPARQL executions.
+  # Public endpoint where users can view − but not abort − SPARQL executions:
   fuseki:endpoint [
     fuseki:name "tracker" ;
     fuseki:operation jetf:exectracker ;
     ja:context [ ] ; # !!! Required to prevent start-up failure due to null context !!!
   ] ;
 
-  # Access protected endpoint where authorized users can abort running queries.
+  # Access-protected endpoint where authorized users can view and abort excutions:
   fuseki:endpoint [
     fuseki:name "admin-tracker" ;
     fuseki:operation jetf:exectracker ;
-    ja:context [ ja:cxtName "https://w3id.org/aksw/jena/exectracker/fuseki#allowAbort" ; ja:cxtValue true ] ;
-    # With jena 6.1.0+ it is possible to use ja:cxtName jetf:allowAbort
+    ja:context [
+      # Jena 6.1.0+ allows `ja:cxtName jetf:allowAbort`
+      ja:cxtName "https://w3id.org/aksw/jena/exectracker/fuseki#allowAbort" ;
+      ja:cxtValue true ;
+    ] ;
     fuseki:allowedUsers "test" ;
   ] ;
   .

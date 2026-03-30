@@ -34,7 +34,10 @@ PREFIX jetf:      <https://w3id.org/aksw/jena/exectracker/fuseki#>
   fuseki:endpoint [
     fuseki:name "admin-tracker" ;
     fuseki:operation jetf:exectracker ;
-    ja:context [ ja:cxtName "https://w3id.org/aksw/jena/exectracker/fuseki#allowAbort" ; ja:cxtValue true ];
+    ja:context [
+      ja:cxtName "https://w3id.org/aksw/jena/exectracker/fuseki#allowAbort" ;
+      ja:cxtValue true ;
+    ];
     fuseki:allowedUsers "test" ;
   ] ;
   .
