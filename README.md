@@ -11,11 +11,11 @@ SPARQL Execution Tracking for Apache Jena via interception at `QueryEngineRegist
   <tr>
     <td align="center">
       <img src="docs/images/fuseki-exectracker-services.png" alt="Fuseki ExecTracker Services" style="max-height: 300px; height: auto;" />
-      <br><em>Dashboard</em>
+      <br><em>Services</em>
     </td>
     <td align="center">
       <img src="docs/images/fuseki-exectracker-dashboard.png" alt="Fuseki ExecTracker Dashboard" style="max-height: 300px; height: auto;" />
-      <br><em>Statistics</em>
+      <br><em>Dashboard</em>
     </td>
   </tr>
 </table>
