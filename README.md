@@ -22,7 +22,7 @@ SPARQL Execution Tracking for Apache Jena via interception at `QueryEngineRegist
 
 The Fuseki Plugin is published with releases: [Latest Release](/releases/latest).
 
-A complete example setup is provided in [example-setup-fuski](example-setup-fuseki).
+A complete example setup is provided in [example-setup-fuseki](example-setup-fuseki).
 
 The following is an example for setting up exec tracker endpoints with a Fuseki service.
 
@@ -75,27 +75,29 @@ PREFIX jetf:      <https://w3id.org/aksw/jena/exectracker/fuseki#>
   .
 ```
 
-Terminology note: We use `fuseki-mod` to refer to the development artifact. The `fuseki-plugin` is the *packaging* of the `fueski-mod` as a drop-in JAR file.
+Terminology note: We use `fuseki-mod` to refer to the development artifact. The `fuseki-plugin` is the *packaging* of the `fuseki-mod` as a drop-in JAR file.
 
 ## Programmatic Usage
+
+Add the following dependency to your project:
+
+```xml
+<dependency>
+  <groupId>org.aksw.jena.exectracker</groupId>
+  <artifactId>jena-exectracker-arq</artifactId>
+  <version>0.1.0-SNAPSHOT</version>
+</dependency>
+```
+
+The library is tested against Apache Jena 6.0.0.
 
 ```java
 public class ExampleExecTracker {
     static { JenaSystem.init(); }
 
     public static void main(String[] args) {
-        // These following registrations happen automagically in JenaPluginExecTracker:
-        // QueryEngineRegistry.get().add(new QueryEngineFactoryExecTracker());
-        // UpdateEngineRegistry.get().add(new UpdateEngineFactoryExecTracker());
-
-        // The aforementioned registration check intercept query and update
-        // executions and check for whether there is a broker in the context.
-        // A broker is both an event listener and an event source - i.e. it is an
-        // event distributor.
-        // If so, the broker is notified of the execution.
         TaskEventBroker broker = TaskEventBroker.getOrCreate(ARQ.getContext());
         
-        // The history broker is broker that in addition saves the last n seen events.
         TaskEventHistory history = TaskEventHistory.getOrCreate(ARQ.getContext());
         history.connect(broker);
 

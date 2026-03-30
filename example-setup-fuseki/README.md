@@ -1,123 +1,83 @@
 ## Example Fuseki Setup
 
-The example sets up a Fuseki with the graphql4sparql plugin and example data.
+This directory contains an example setup for running Jena ExecTracker with Apache Fuseki.
+
+### Quick Start
 
 ```bash
+# Setup Fuseki with ExecTracker plugin and example data
 $ make setup-example
 ------------------------
 Fuseki set up! Start it with:
 
 (cd target/fuseki && ./fuseki-server --config=run/config.ttl --port 3030)
 
-The Web UI will be available at http://localhost:3030/graphql-test/graphql
+The ExecTracker UI will be available at http://localhost:3030/example-exectracker/tracker
 
-Here is an example query to put into the UI:
+Querying the endpoint will show ongoing executions in the ExecTracker UI.
 
-query @debug @pretty {
-  Person {
-    uri
-    birthDate
-    topic_interest {
-      title
-      creator {
-        uri
-      }
-    }
-  }
-}
+curl http://localhost:3030/example-exectracker/query -G --data-urlencode 'query=SELECT * { ?s ?p ?o } LIMIT 2'
+
+And so will updates:
+
+curl -X POST http://localhost:3030/example-exectracker/update -u 'test:test' --data-urlencode 'update=INSERT DATA { <x> <y> <z> }'
 ```
 
-It is also possible to query with curl:
+### Setup Details
+
+The `make setup-example` command:
+
+1. Downloads Apache Jena Fuseki 6.0.0
+2. Copies the ExecTracker Fuseki plugin JAR to Fuseki's `run/extra/` directory
+3. Installs the configuration files (`config.ttl`, `passwd.txt`, `exectracker-demo_ds.ttl`, `mona-lisa.ttl`)
+4. Sets up the example RDF data
+
+### Configuration
+
+The example uses these configuration files:
+
+| File | Description |
+|------|-------------|
+| `config.ttl` | Fuseki server configuration (enables basic authentication) |
+| `passwd.txt` | User credentials (`test:test`) |
+| `exectracker-demo_ds.ttl` | ExecTracker service configuration |
+| `mona-lisa.ttl` | Example RDF data (Bob + Mona Lisa) |
+
+### ExecTracker Endpoints
+
+The example setup provides two ExecTracker endpoints:
+
+| Endpoint | URL | Description |
+|----------|-----|-------------|
+| `tracker` | `/example-exectracker/tracker` | Public endpoint to view SPARQL executions (read-only) |
+| `admin-tracker` | `/example-exectracker/admin-tracker` | Protected endpoint with abort permission (user: `test`) |
+
+### Example Queries
 
 ```bash
-curl -X POST 'http://localhost:3030/graphql-test/graphql' -d \
-  '{"query":"query @debug @pretty { Person { uri birthDate topic_interest { title } } }"}'
+# Query the dataset
+curl http://localhost:3030/example-exectracker/query -G --data-urlencode 'query=SELECT * { ?s ?p ?o } LIMIT 2'
+
+# Update the dataset (requires authentication)
+curl -X POST http://localhost:3030/example-exectracker/update -u 'test:test' --data-urlencode 'update=INSERT DATA { <x> <y> <z> }'
+
+# Access the ExecTracker dashboard
+open http://localhost:3030/example-exectracker/tracker
 ```
 
-Once Fuseki is running, visit the graphql interface at: `http://localhost:3030/graphql-test/graphql`
+### ExecTracker Dashboard
 
-Thanks to the schema, it is possible to write simple GraphQL queries such as the following.
-Use `@pretty` for pretty formatting and `@debug` for the generated response to include the underlying SPARQL query string.
+The ExecTracker dashboard shows active and completed query executions.
 
-```graphql
-query Works @pretty @debug {
-  Work {
-    type
-    title
-    creator
-  }
-}
-```
-
-```json
-{
-  "data": {
-    "Work": [
-      {
-        "type": "http://dbpedia.org/ontology/Work",
-        "title": "Mona Lisa",
-        "creator": "http://dbpedia.org/resource/Leonardo_da_Vinci"
-      }
-    ]
-  },
-  "errors": []
-  "extensions": {
-    "metadata": {
-      "sparqlQuery": "# SPARQL query string omitted for brevity."
-    }
-  }
-}
-```
-
-GraphQl4Sparql also supports sophisticated patterns where GraphQL fields are turned into dynamic data generators.
-The following is the generic "`SELECT SPO`" query which groups all data by subject, predicate and objects.
-
-```graphql
-query spo @debug @pretty {
-  subjects @pattern(of: "SELECT DISTINCT ?s { ?s ?p ?o } ", to: "s") @index(by: "?s", oneIf: "true") {
-    predicates @pattern(of: "?s2 ?p2 ?o2", from: "s2", to: ["s2", "p2", "o2"]) @index(by: "?p2", oneIf: "false") @array {
-      objects @bind(of: "?o2")
-    }
-  }
-}
-```
-
-Expected response:
-```json
-{
-  "data": {
-    "http://dbpedia.org/resource/Mona_Lisa": {
-      "http://purl.org/dc/terms/creator": [
-        "http://dbpedia.org/resource/Leonardo_da_Vinci"
-      ],
-      "http://purl.org/dc/terms/title": [
-        "Mona Lisa"
-      ],
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [
-        "http://dbpedia.org/ontology/Work"
-      ]
-    },
-    "http://www.example.org/Bob": {
-      "http://schema.org/birthDate": [
-        "1990-07-04"
-      ],
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#type": [
-        "http://xmlns.com/foaf/0.1/Person"
-      ],
-      "http://xmlns.com/foaf/0.1/knows": [
-        "http://www.example.org/Alice"
-      ],
-      "http://xmlns.com/foaf/0.1/topic_interest": [
-        "http://dbpedia.org/resource/Mona_Lisa"
-      ]
-    }
-  },
-  "errors": [],
-  "extensions": {
-    "metadata": {
-      "sparqlQuery": "# SPARQL query string omitted for brevity."
-    }
-  }
-}
-```
-
+<table>
+  <tr>
+    <td align="center">
+      <img src="../docs/images/fuseki-exectracker-services.png" alt="Fuseki ExecTracker Services" style="max-height: 300px; height: auto;" />
+      <br><em>Services</em>
+    </td>
+    <td align="center">
+      <img src="../docs/images/fuseki-exectracker-dashboard.png" alt="Fuseki ExecTracker Dashboard" style="max-height: 300px; height: auto;" />
+      <br><em>Dashboard</em>
+    </td>
+  </tr>
+</table>

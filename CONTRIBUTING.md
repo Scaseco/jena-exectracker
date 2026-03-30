@@ -1,13 +1,13 @@
-# Contributing to GraphQl4Sparql
+# Contributing to Jena ExecTracker
 
-Thank you for your interest in contributing to GraphQl4Sparql! This document provides guidelines and instructions for contributing.
+Thank you for your interest in contributing to Jena ExecTracker! This document provides guidelines and instructions for contributing.
 
 ## How Can I Contribute?
 
 ### Reporting Bugs
 
 Before creating a bug report:
-- Check if the issue has already been reported in the [issue tracker](https://github.com/Scaseco/graphql4sparql/issues)
+- Check if the issue has already been reported in the [issue tracker](https://github.com/Scaseco/jena-exectracker/issues)
 - Verify you're using the latest version
 - Include as much detail as possible
 
@@ -17,7 +17,7 @@ Before creating a bug report:
 - Expected behavior
 - Actual behavior
 - Screenshots if applicable
-- Your environment (OS, Java version, GraphQl4Sparql version)
+- Your environment (OS, Java version, Jena ExecTracker version)
 - Relevant logs or error messages
 
 ### Suggesting Features
@@ -55,8 +55,8 @@ Feature requests are welcome! Please:
 
 ```bash
 # Clone the repository
-git clone https://github.com/Scaseco/graphql4sparql.git
-cd graphql4sparql-parent
+git clone https://github.com/Scaseco/jena-exectracker.git
+cd jena-exectracker-parent
 
 # Build the project
 mvn clean install
@@ -83,4 +83,3 @@ mvn test
 ## License
 
 By contributing, you agree that your contributions will be licensed under the [Apache License 2.0](LICENSE).
-
