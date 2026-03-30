@@ -5,10 +5,20 @@
 
 SPARQL Execution Tracking for Apache Jena via interception at `QueryEngineRegistry` and `UpdateEngineRegistry`.
 
-![Fuseki ExecTracker Services](docs/images/fuseki-exectracker-services.png)
-![Fuseki ExecTracker Dashboard](docs/images/fuseki-exectracker-dashboard.png)
-
 ## Fuseki Plugin
+
+<table>
+  <tr>
+    <td align="center">
+      <img src="docs/images/fuseki-exectracker-services.png" alt="Fuseki ExecTracker Services" style="max-height: 300px; height: auto;" />
+      <br><em>Dashboard</em>
+    </td>
+    <td align="center">
+      <img src="docs/images/fuseki-exectracker-dashboard.png" alt="Fuseki ExecTracker Dashboard" style="max-height: 300px; height: auto;" />
+      <br><em>Statistics</em>
+    </td>
+  </tr>
+</table>
 
 The Fuseki Plugin is published with releases: [Latest Release](/releases/latest).
 
