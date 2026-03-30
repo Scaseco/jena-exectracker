@@ -117,6 +117,17 @@ public class ExampleExecTracker {
 }
 ```
 
+**Under the Hood:**
+The ExecTracker intercepts query and update executions at the `QueryEngineRegistry` and `UpdateEngineRegistry`. When using the `jena-exectracker-arq` dependency, these registrations happen automatically via the Jena plugin mechanism:
+
+```java
+// Automatic registrations (you don't need to do this):
+QueryEngineRegistry.get().add(new QueryEngineFactoryExecTracker());
+UpdateEngineRegistry.get().add(new UpdateEngineFactoryExecTracker());
+```
+
+The registration check intercepts query and update executions and checks for whether there is a broker in the context. A broker is both an event listener and an event source - i.e. it is an event distributor. If so, the broker is notified of the execution.
+
 ## Build from Source
 
 For convenience, a self-describing `Makefile` is provided:
