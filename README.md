@@ -146,6 +146,6 @@ Contributions are welcome! Please read our [contributing guidelines](CONTRIBUTIN
 
 ## Contact
 
-* Issue tracker: https://github.com/Scaseco/graphql4sparql/issues
+* Issue tracker: https://github.com/Scaseco/jena-exectracker/issues
 * Author: [Claus Stadler](http://aksw.org/ClausStadler)
 
