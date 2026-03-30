@@ -1,9 +1,11 @@
 package org.aksw.jenax.sparql.exec.tracker.system;
 
 import java.time.Instant;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 import org.aksw.jenax.sparql.exec.tracker.core.IteratorTracked;
+import org.apache.jena.query.Query;
 import org.apache.jena.sparql.engine.QueryIterator;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.engine.iterator.QueryIteratorWrapper;
@@ -14,11 +16,11 @@ public class QueryIteratorTask
 {
     private BasicTaskInfoImpl<QueryIteratorTask> taskInfo;
 
-    public QueryIteratorTask(QueryIterator qIter, TaskListener<? super QueryIteratorTask> listener) {
+    public QueryIteratorTask(Query query, QueryIterator qIter, TaskListener<? super QueryIteratorTask> listener) {
         super(qIter);
-        taskInfo = new BasicTaskInfoImpl<>(this, Instant.now(), listener);
-        taskInfo.transition(this, TaskState.STARTING, null);
-        taskInfo.transition(this, TaskState.RUNNING, null);
+        taskInfo = new BasicTaskInfoImpl<>(this, () -> Objects.toString(query), Instant.now(), listener);
+        taskInfo.transition(TaskState.STARTING, null);
+        taskInfo.transition(TaskState.RUNNING, null);
     }
 
     @Override
@@ -38,16 +40,16 @@ public class QueryIteratorTask
 
     @Override
     public final void requestCancel() {
-        taskInfo.transition(this, TaskState.TERMINATING, () -> iterator.cancel());
+        taskInfo.transition(TaskState.TERMINATING, () -> super.requestCancel());
     }
 
     @Override
-    public void close() {
-        taskInfo.transition(this, TaskState.TERMINATING, null);
+    public void closeIterator() {
+        taskInfo.transition(TaskState.TERMINATING, null);
         try {
-            super.close();
+            super.closeIterator();
         } finally {
-            taskInfo.transition(this, TaskState.TERMINATED, null);
+            taskInfo.transition(TaskState.TERMINATED, null);
         }
     }
 
@@ -58,6 +60,6 @@ public class QueryIteratorTask
 
     @Override
     public void abort() {
-        this.cancel();
+        cancel();
     }
 }

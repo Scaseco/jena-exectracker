@@ -41,7 +41,7 @@
 	<modules>
 		<module>jena-exectracker-arq</module>
 		<module>jena-exectracker-fuseki-mod</module>
-		<module>jena-exectracker-pkg-fuseki-mod</module>
+		<module>jena-exectracker-pkg-fuseki-plugin</module>
 	</modules>
 	<properties>
 		<jena.version>6.0.0</jena.version>
@@ -57,7 +57,9 @@
 		<maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
 		<maven-source-plugin.version>3.4.0</maven-source-plugin.version>
 		<maven-deploy-plugin.version>3.1.4</maven-deploy-plugin.version>
+		<maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
 		<maven-war-plugin.version>3.5.1</maven-war-plugin.version>
+		<maven-install-plugin.version>3.1.2</maven-install-plugin.version>
 		<maven-dependency-plugin.version>3.0.2</maven-dependency-plugin.version>
 
 		<lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
@@ -87,7 +89,7 @@
 				<artifactId>jena-arq</artifactId>
 				<version>${jena.version}</version>
 			</dependency>
-			
+
 			<dependency>
 				<groupId>org.apache.jena</groupId>
 				<artifactId>jena-fuseki-main</artifactId>
@@ -259,6 +261,16 @@
 				<version>${maven-surefire-plugin.version}</version>
 				<!-- <configuration> <skipTests>false</skipTests>
 				</configuration> -->
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>${maven-jar-plugin.version}</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-install-plugin</artifactId>
+				<version>${maven-install-plugin.version}</version>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

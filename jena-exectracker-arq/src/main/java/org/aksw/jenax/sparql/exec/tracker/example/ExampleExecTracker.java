@@ -1,26 +1,22 @@
 package org.aksw.jenax.sparql.exec.tracker.example;
 
-import org.aksw.jenax.sparql.exec.tracker.plugin.QueryEngineFactoryExecTracker;
-import org.aksw.jenax.sparql.exec.tracker.plugin.UpdateEngineFactoryExecTracker;
 import org.aksw.jenax.sparql.exec.tracker.system.TaskEventBroker;
 import org.aksw.jenax.sparql.exec.tracker.system.TaskEventHistory;
 import org.apache.jena.query.ARQ;
 import org.apache.jena.sparql.algebra.Table;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.DatasetGraphFactory;
-import org.apache.jena.sparql.engine.QueryEngineRegistry;
 import org.apache.jena.sparql.exec.QueryExec;
 import org.apache.jena.sparql.exec.RowSetOps;
 import org.apache.jena.sparql.exec.UpdateExec;
-import org.apache.jena.sparql.modify.UpdateEngineRegistry;
 import org.apache.jena.sys.JenaSystem;
 
 public class ExampleExecTracker {
     static { JenaSystem.init(); }
 
     public static void main(String[] args) {
-        QueryEngineRegistry.get().add(new QueryEngineFactoryExecTracker());
-        UpdateEngineRegistry.get().add(new UpdateEngineFactoryExecTracker());
+        // QueryEngineRegistry.get().add(new QueryEngineFactoryExecTracker());
+        // UpdateEngineRegistry.get().add(new UpdateEngineFactoryExecTracker());
 
         TaskEventBroker broker = TaskEventBroker.getOrCreate(ARQ.getContext());
         TaskEventHistory history = TaskEventHistory.getOrCreate(ARQ.getContext());

@@ -1,4 +1,4 @@
-package org.aksw.jenax.sparql.exec.tracker.plugin;
+package org.aksw.jena.exectracker.arq.plugin;
 
 import org.apache.jena.sparql.engine.QueryEngineRegistry;
 import org.apache.jena.sparql.modify.UpdateEngineRegistry;
@@ -28,7 +28,7 @@ public class JenaPluginExecTracker
     }
 
     public static void init(UpdateEngineRegistry reg) {
-         // reg.add(new UpdateEngineFactoryover());
+         reg.add(new UpdateEngineFactoryExecTracker());
     }
 
     @Override

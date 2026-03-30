@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.jena.fuseki.mod.exectracker;
+package org.aksw.jena.exectracker.fuseki.mod;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,13 +26,13 @@ import java.util.Set;
 import org.aksw.jenax.sparql.exec.tracker.system.TaskEventBroker;
 import org.aksw.jenax.sparql.exec.tracker.system.TaskEventHistory;
 import org.apache.jena.fuseki.Fuseki;
+import org.apache.jena.fuseki.FusekiConfigException;
 import org.apache.jena.fuseki.main.FusekiServer;
 import org.apache.jena.fuseki.main.sys.FusekiAutoModule;
 import org.apache.jena.fuseki.server.DataAccessPoint;
 import org.apache.jena.fuseki.server.DataAccessPointRegistry;
 import org.apache.jena.fuseki.server.DataService;
 import org.apache.jena.fuseki.server.Endpoint;
-import org.apache.jena.fuseki.server.FusekiVocab;
 import org.apache.jena.fuseki.server.Operation;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.sparql.core.DatasetGraph;
@@ -40,10 +40,11 @@ import org.apache.jena.sparql.util.Context;
 import org.apache.jena.sparql.util.Symbol;
 
 public class FMod_ExecTracker implements FusekiAutoModule {
-    public static final Symbol symAllowAbort = Symbol.create("allowAbort");
+    public static final String NS = "https://w3id.org/aksw/jena/exectracker/fuseki#";
+    public static final Symbol symAllowAbort = Symbol.create(NS + "allowAbort");
 
     private static final Operation OPERATION = Operation.alloc(
-            FusekiVocab.NS + "exectracker", "ExecTracker", "Execution Tracker");
+            NS + "exectracker", "ExecTracker", "Execution Tracker");
 
     public static Operation getOperation() {
         return OPERATION;
@@ -88,7 +89,14 @@ public class FMod_ExecTracker implements FusekiAutoModule {
 
                     // Then register task trackers with history into the endpoint context.
                     for (Endpoint endpoint : trackerEndpoints) {
+                        String endpointLabel = dap.getName() + "/" + endpoint.getName();
+                        Fuseki.configLog.info(endpointLabel + ": Setting up ExecTracker.");
                         Context endpointCxt = endpoint.getContext();
+                        if (endpointCxt == null) {
+                            // XXX Could we set up our own endpoint copy that ensures a non-null context?
+                            throw new FusekiConfigException(endpointLabel + ": Cannot register exec tracker because context is null. "
+                                    + "Try adding an empty context to your cofiguration: <your-service> fuseki:endpoint [ ja:context [ ] ] .");
+                        }
 
                         TaskEventHistory historyTracker = TaskEventHistory.getOrCreate(endpointCxt);
                         historyTracker.connect(taskTrackerRegistry);

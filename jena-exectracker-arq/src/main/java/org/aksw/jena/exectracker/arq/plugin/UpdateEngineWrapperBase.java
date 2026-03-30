@@ -1,4 +1,4 @@
-package org.aksw.jenax.sparql.exec.tracker.plugin;
+package org.aksw.jena.exectracker.arq.plugin;
 
 import org.apache.jena.sparql.modify.UpdateEngine;
 

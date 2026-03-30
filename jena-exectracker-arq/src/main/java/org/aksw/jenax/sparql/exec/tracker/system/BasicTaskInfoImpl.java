@@ -3,8 +3,10 @@ package org.aksw.jenax.sparql.exec.tracker.system;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.aksw.jenax.sparql.exec.tracker.core.ThrowableTracker;
+import org.aksw.jenax.sparql.exec.tracker.core.ThrowableTrackerFirst;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,6 +16,7 @@ public class BasicTaskInfoImpl<T extends HasBasicTaskExec>
     private static final Logger logger = LoggerFactory.getLogger(BasicTaskInfoImpl.class);
 
     protected final T owner;
+    protected Supplier<String> labelSupplier;
     protected TaskListener<? super T> listener;
     protected ThrowableTracker throwableTracker;
     protected Instant creationTime;
@@ -22,15 +25,17 @@ public class BasicTaskInfoImpl<T extends HasBasicTaskExec>
     protected Instant finishTime = null;
     protected TaskState currentState = TaskState.CREATED;
 
-    public BasicTaskInfoImpl(T owner, TaskListener<T> listener) {
-        this(owner, Instant.now(), listener);
+    public BasicTaskInfoImpl(T owner, Supplier<String> labelSupplier, TaskListener<T> listener) {
+        this(owner, labelSupplier, Instant.now(), listener);
     }
 
-    public BasicTaskInfoImpl(T owner, Instant creationTime, TaskListener<? super T> listener) {
+    public BasicTaskInfoImpl(T owner, Supplier<String> labelSupplier, Instant creationTime, TaskListener<? super T> listener) {
         super();
+        this.throwableTracker = new ThrowableTrackerFirst();
         this.owner = Objects.requireNonNull(owner);
         this.creationTime = Objects.requireNonNull(creationTime);
         this.listener = Objects.requireNonNull(listener);
+        this.labelSupplier = labelSupplier;
     }
 
     @Override
@@ -68,6 +73,7 @@ public class BasicTaskInfoImpl<T extends HasBasicTaskExec>
         if (currentState == null || newState.ordinal() > currentState.ordinal()) {
             // State oldState = currentState;
             currentState = newState;
+            updateTime(currentState);
             if (listener != null) {
                 try {
                     listener.onStateChange(obj);
@@ -81,17 +87,18 @@ public class BasicTaskInfoImpl<T extends HasBasicTaskExec>
     protected void updateTime(TaskState reachedState) {
         switch (reachedState) {
         case CREATED:
-            creationTime = Instant.now();
+            if (creationTime == null) { creationTime = Instant.now(); }
             break;
         case STARTING:
+            if (startTime == null) { startTime = Instant.now(); }
             break;
         case RUNNING:
-            startTime = Instant.now();
+            // runningTime = Instant.now();
             break;
         case TERMINATING:
             break;
         case TERMINATED:
-            finishTime = Instant.now();
+            if (finishTime == null) { finishTime = Instant.now(); }
             break;
         default:
             throw new IllegalStateException("should never come here");
@@ -99,8 +106,14 @@ public class BasicTaskInfoImpl<T extends HasBasicTaskExec>
     }
 
     public void cancel() {
-        this.abortTime = Instant.now();
+        if (abortTime == null) {
+            this.abortTime = Instant.now();
+        }
         transition(owner, TaskState.TERMINATING, null);
+    }
+
+    public void transition(TaskState targetState, Runnable action) {
+        transition(owner, targetState, action);
     }
 
     /**
@@ -127,14 +140,13 @@ public class BasicTaskInfoImpl<T extends HasBasicTaskExec>
 
     @Override
     public String getLabel() {
-        // TODO Auto-generated method stub
-        return null;
+        String result = Optional.ofNullable(labelSupplier).map(Supplier::get).orElse("");
+        return result;
     }
 
     @Override
     public String getStatusMessage() {
-        // TODO Auto-generated method stub
-        return null;
+        return "";
     }
 
     @Override

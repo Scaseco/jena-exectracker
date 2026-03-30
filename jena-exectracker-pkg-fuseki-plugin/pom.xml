@@ -8,8 +8,12 @@
     <version>0.1.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>jena-exectracker-pkg-fuseki-mod</artifactId>
-  <name>Jena ExecTracker - Fuseki Mod - Plugin Jar Packaging</name>
+  <artifactId>jena-exectracker-pkg-fuseki-plugin</artifactId>
+  <name>Jena ExecTracker - Fuseki Mod - Plugin Packaging</name>
+
+  <properties>
+    <outputBaseName>jena-exectracker-fuseki-plugin-${project.version}</outputBaseName>
+  </properties>
 
   <dependencies>
     <dependency>
@@ -32,7 +36,6 @@
 
   <build>
     <plugins> 
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
@@ -46,18 +49,30 @@
           <doctitle>Jena ExecTracker - Fuseki Mod ${project.version}</doctitle>
         </configuration>
       </plugin>
-     
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-deploy-plugin</artifactId>
-        <configuration>
-          <skip>false</skip>
-        </configuration>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-jar</id>
+            <phase>none</phase>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-install-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-install</id>
+            <phase>none</phase>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
 
-  <!-- Profile to build a "plugin jar bundle" that can be loaded with fuseki or any other jena-based app -->
   <profiles>
     <profile>
       <id>bundle</id>
@@ -67,9 +82,35 @@
           <artifactId>jena-arq</artifactId>
           <scope>provided</scope>
         </dependency>
+        <dependency>
+          <groupId>org.apache.jena</groupId>
+          <artifactId>jena-fuseki-main</artifactId>
+          <scope>provided</scope>
+        </dependency>
       </dependencies>
       <build>  
         <plugins>
+          <!-- jar file produced with this configuration gets intensionally overwritten by the shade plugin -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>default-jar</id>
+                <phase>package</phase>
+              </execution>
+            </executions>
+            <configuration>
+              <finalName>${outputBaseName}</finalName>
+              <!-- Skip manifest as shade will overwrite -->
+<!--              <archive>-->
+<!--                <manifest>-->
+<!--                  <addDefaultImplementationEntries>false</addDefaultImplementationEntries>-->
+<!--                  <addDefaultSpecificationEntries>false</addDefaultSpecificationEntries>-->
+<!--                </manifest>-->
+<!--              </archive>-->
+            </configuration>
+          </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-shade-plugin</artifactId>
@@ -80,16 +121,8 @@
                   <goal>shade</goal>
                 </goals>
                 <configuration>
-                <shadedArtifactAttached>true</shadedArtifactAttached>
-                  <shadedClassifierName>jar-with-dependencies</shadedClassifierName>
-                  <!--
-                  <relocations>
-                    <relocation>
-                      <pattern>foobar</pattern>
-                      <shadedPattern>org.aksw.jena.exectracker.shaded.foobar</shadedPattern>
-                    </relocation>
-                  </relocations>
-                  -->
+                  <shadedArtifactAttached>false</shadedArtifactAttached>
+                  <outputFile>${project.build.directory}/${outputBaseName}.jar</outputFile>
                   <transformers>
                     <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
                     <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer" />
@@ -99,7 +132,6 @@
                   </transformers>
                   <filters>
                     <filter>
-                      <artifact>*:*</artifact>
                       <excludes>
                         <exclude>META-INF/*.SF</exclude>
                         <exclude>META-INF/*.DSA</exclude>
@@ -117,11 +149,7 @@
         </plugins>
       </build>
     </profile>
-    <!-- Profile that unpacks the class files from the JAR release of this maven module. -->
-    <!-- Use the command below to create a shaded Fuseki-Mod plugin jar from this pom.xml alone. -->
-    <!-- The command execution will attempt to download the necessary JAR files and only operate on them. -->
-    <!-- The Java source code does not have to be present. -->
-    <!-- mvn -Punpack-own-classes,bundle -Dmaven.test.skip package -->
+
     <profile>
       <id>unpack-own-classes</id>
       <build>
@@ -147,7 +175,6 @@
                       <outputDirectory>${project.build.outputDirectory}</outputDirectory>
                     </artifactItem>
                   </artifactItems>
-                  <!-- Skip if classes already exist (normal build with sources) -->
                   <overWriteIfNewer>false</overWriteIfNewer>
                 </configuration>
               </execution>

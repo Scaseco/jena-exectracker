@@ -1,4 +1,4 @@
-package org.aksw.jenax.sparql.exec.tracker.plugin;
+package org.aksw.jena.exectracker.arq.plugin;
 
 import java.time.Instant;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -21,14 +21,16 @@ public class UpdateEngineExecTracker
     public UpdateEngineExecTracker(UpdateEngine delegate, Context context, TaskListener<? super UpdateEngineExecTracker> listener) {
         super(delegate);
         this.context = context;
-        this.taskInfo = new BasicTaskInfoImpl<>(this, Instant.now(), listener);
+        this.taskInfo = new BasicTaskInfoImpl<>(this, () -> "# Update Request", Instant.now(), listener);
     }
 
+    @Override
     public void startRequest() {
         taskInfo.transition(this, TaskState.STARTING, null);
         taskInfo.transition(this, TaskState.RUNNING, () -> { super.startRequest(); });
     }
 
+    @Override
     public void finishRequest() {
         try {
             super.finishRequest();
@@ -47,6 +49,7 @@ public class UpdateEngineExecTracker
         AtomicBoolean cancelSignal = context == null ? null : Context.getOrSetCancelSignal(context);
         if (cancelSignal != null) {
             cancelSignal.set(true);
+            taskInfo.transition(this, TaskState.TERMINATING, null);
         }
     }
 }

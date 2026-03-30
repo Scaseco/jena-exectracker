@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.jena.fuseki.mod.exectracker;
+package org.aksw.jena.exectracker.fuseki.mod;
 
 import java.io.IOException;
 import java.time.Instant;

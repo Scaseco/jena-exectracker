@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.jena.fuseki.mod.exectracker;
+package org.aksw.jena.exectracker.fuseki.mod;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -149,7 +149,7 @@ public class ExecTrackerService extends BaseActionREST {
     }
 
     protected void servePage(HttpAction action) {
-        // Serves the minimal graphql ui
+        // Serves the minimal ExecTracker Web UI.
         String resourceName = "exectracker/index.html";
         String str = null;
         try (InputStream in = ExecTrackerService.class.getClassLoader().getResourceAsStream(resourceName)) {

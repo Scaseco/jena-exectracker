@@ -12,7 +12,7 @@
 
   <artifactId>jena-exectracker-fuseki-mod</artifactId>
 
-  <name>Jena ExecTracker - Fueski Mod</name>
+  <name>Jena ExecTracker - Fuseki Mod</name>
   <description>HTML Execution Tracker Module for Fuseki</description>
 
   <properties>
@@ -23,13 +23,12 @@
     <dependency>
       <groupId>org.aksw.jena.exectracker</groupId>
       <artifactId>jena-exectracker-arq</artifactId>
-      <!-- <scope>provided</scope>-->
     </dependency>
 
     <dependency>
       <groupId>org.apache.jena</groupId>
       <artifactId>jena-fuseki-main</artifactId>
-      <!-- <scope>provided</scope>-->
+      <!-- <scope>provided</scope> -->
     </dependency>
 
     <!-- Testing -->
@@ -69,61 +68,4 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
-  <profiles>
-    <profile>
-      <id>bundle</id>
-      <!-- Profile to create a shaded jar suitable for use as an extra drop-in jar for Fuseki. -->
-      <dependencies>
-        <dependency>
-          <groupId>org.apache.jena</groupId>
-          <artifactId>jena-fuseki-main</artifactId>
-          <scope>provided</scope>
-        </dependency>
-      </dependencies>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-shade-plugin</artifactId>
-            <configuration>
-              <transformers>
-                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
-                <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer" />
-                <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer">
-                  <addHeader>false</addHeader>
-                </transformer>
-              </transformers>
-              <filters>
-                <filter>
-                  <artifact>*:*</artifact>
-                  <excludes>
-                    <!-- Some jars are signed but shading breaks
-                    that. Don't include signing files. -->
-                    <exclude>META-INF/*.SF</exclude>
-                    <exclude>META-INF/*.DSA</exclude>
-                    <exclude>META-INF/*.RSA</exclude>
-                    <exclude>META-INF/DEPENDENCIES</exclude>
-                    <exclude>META-INF/MANIFEST.MF</exclude>
-                    <exclude>**/module-info.class</exclude>
-                    <exclude>META-INF/versions/9/OSGI-INF/MANIFEST.MF</exclude>
-                  </excludes>
-                </filter>
-              </filters>
-            </configuration>
-            <executions>
-              <execution>
-                <phase>package</phase>
-                <!--<phase /><!- - Switch off -->
-                <goals>
-                  <goal>shade</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
-
 </project>

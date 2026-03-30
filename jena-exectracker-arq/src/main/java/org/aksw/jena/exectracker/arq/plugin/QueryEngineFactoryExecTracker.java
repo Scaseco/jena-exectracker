@@ -1,4 +1,4 @@
-package org.aksw.jenax.sparql.exec.tracker.plugin;
+package org.aksw.jena.exectracker.arq.plugin;
 
 import java.util.Objects;
 
@@ -121,7 +121,7 @@ public class QueryEngineFactoryExecTracker
             TaskEventBroker broker = TaskEventBroker.get(cxt);
             QueryIterator result = (broker == null)
                 ? baseIt
-                : new QueryIteratorTask(baseIt, broker);
+                : new QueryIteratorTask(query, baseIt, broker);
             return result;
         }
     }

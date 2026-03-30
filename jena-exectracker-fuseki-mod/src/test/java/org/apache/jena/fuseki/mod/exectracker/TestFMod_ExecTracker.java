@@ -27,6 +27,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import org.aksw.jena.exectracker.fuseki.mod.ExecTrackerService;
+import org.aksw.jena.exectracker.fuseki.mod.FMod_ExecTracker;
 import org.aksw.jenax.sparql.exec.tracker.system.TaskEventBroker;
 import org.aksw.jenax.sparql.exec.tracker.system.TaskEventHistory;
 import org.apache.jena.fuseki.main.FusekiMain;
