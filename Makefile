@@ -16,7 +16,7 @@ loud = echo "@@" $(1);$(1)
 help:   ## Show these help instructions
 	@sed -rn 's/^([a-zA-Z_-]+):.*?## (.*)$$/"\1" "\2"/p' < $(MAKEFILE_LIST) | xargs printf "make %-20s# %s\n"
 
-fuseki-plugin: ## Create only the standalone jar-with-dependencies for the Fuseki Mod
+fuseki-plugin: ## Create the self-contained ExecTracker Fuseki Plugin JAR
 	$(MCCS) $(POM) package -Pbundle -pl :jena-exectracker-pkg-fuseki-plugin -am $(ARGS)
 	file=`find '$(CWD)/jena-exectracker-pkg-fuseki-plugin/target' -name '*-fuseki-plugin*.jar'`
 	printf '\nCreated package:\n\n%s\n\n' "$$file"
@@ -25,8 +25,8 @@ release-github: SHELL:=/bin/bash
 release-github: ## Create files for Github upload
 	@set -eu
 	ver=$(VER)
-	$(call loud,$(MAKE) uberjar-fuseki-mod)
+	$(call loud,$(MAKE) fuseki-plugin)
 	file=`find '$(CWD)/jena-exectracker-pkg-fuseki-plugin/target' -name '*-fuseki-plugin*.jar'`
-	$(call loud,cp "$$file" "jena-exectracker-fuseki-mod-$$ver.jar")
-	$(call loud,gh release create v$$ver "jena-exectracker-fuseki-mod-$$ver.jar")
+	$(call loud,cp "$$file" "jena-exectracker-fuseki-plugin-$$ver.jar")
+	$(call loud,gh release create v$$ver "jena-exectracker-fuseki-plugin-$$ver.jar")
 
