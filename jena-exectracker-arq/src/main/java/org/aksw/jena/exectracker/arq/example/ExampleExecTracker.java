@@ -7,6 +7,7 @@ import org.apache.jena.sparql.algebra.Table;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.DatasetGraphFactory;
 import org.apache.jena.sparql.exec.QueryExec;
+import org.apache.jena.sparql.exec.RowSet;
 import org.apache.jena.sparql.exec.RowSetOps;
 import org.apache.jena.sparql.exec.UpdateExec;
 import org.apache.jena.sys.JenaSystem;
@@ -43,6 +44,16 @@ public class ExampleExecTracker {
         Table table = QueryExec.dataset(dsg).query("SELECT * { ?s ?p ?o }").table();
         RowSetOps.out(table.toRowSet());
 
+
+        try (QueryExec qe = QueryExec.dataset(dsg).query("SELECT * { ?s ?p ?o }").build()) {
+            RowSet rs = qe.select();
+            qe.abort();
+            rs.next();
+        } catch (Throwable ignored) {
+            System.out.println("Got exception: " + ignored);
+        }
+
         System.out.println(history);
+        history.getHistory().forEach(e -> System.out.println("Entry: " + e));
     }
 }

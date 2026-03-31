@@ -176,7 +176,6 @@ public class QueryEngineFactoryExecTracker implements QueryEngineFactory {
         @Override
         public QueryIterator iterator() {
             QueryIterator baseIt = super.iterator();
-            ThrowableTracker throwableTracker = new ThrowableTrackerFirst();
             Context cxt = getContext();
             TaskEventBroker broker = TaskEventBroker.get(cxt);
             QueryIterator result =

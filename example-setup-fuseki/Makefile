@@ -83,5 +83,7 @@ $(FUSEKI_BASE)/run/extra/jena-exectracker-fuseki-plugin.jar: $(FUSEKI_BASE)/setu
 build-fuseki-plugin: $(FUSEKI_BASE)/run/extra/jena-exectracker-fuseki-plugin.jar
 
 clean-fuseki-plugin:
-	rm -f $(FUSEKI_BASE)/run/extra/jena-exectracker-fuseki-plugin.jar
+	rm -f "$(FUSEKI_BASE)/run/extra/jena-exectracker-fuseki-plugin.jar"
 
+clean-fuseki-setup: ## Delete the folder `target/fuseki`
+	rm -rf "$(FUSEKI_BASE)"

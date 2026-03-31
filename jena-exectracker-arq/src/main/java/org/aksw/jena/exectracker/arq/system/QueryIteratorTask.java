@@ -5,17 +5,20 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 import org.aksw.jena.exectracker.arq.core.IteratorTracked;
+import org.apache.jena.atlas.io.IndentedWriter;
 import org.apache.jena.query.Query;
 import org.apache.jena.sparql.engine.QueryIterator;
 import org.apache.jena.sparql.engine.binding.Binding;
-import org.apache.jena.sparql.engine.iterator.QueryIteratorWrapper;
+import org.apache.jena.sparql.serializer.SerializationContext;
 
 /**
  * Wraps a QueryIterator with full task lifecycle management including state tracking and exception
  * handling.
  */
-public class QueryIteratorTask extends QueryIteratorWrapper implements HasBasicTaskExec {
+public class QueryIteratorTask extends QueryIteratorPureWrapper<QueryIterator> implements HasBasicTaskExec {
+
     private BasicTaskInfoImpl<QueryIteratorTask> taskInfo;
+    private Query query;
 
     /**
      * Create a new QueryIteratorTask.
@@ -27,6 +30,7 @@ public class QueryIteratorTask extends QueryIteratorWrapper implements HasBasicT
     public QueryIteratorTask(
             Query query, QueryIterator qIter, TaskListener<? super QueryIteratorTask> listener) {
         super(qIter);
+        this.query = query;
         taskInfo =
                 new BasicTaskInfoImpl<>(this, () -> Objects.toString(query), Instant.now(), listener);
         taskInfo.transition(TaskState.STARTING, null);
@@ -34,30 +38,35 @@ public class QueryIteratorTask extends QueryIteratorWrapper implements HasBasicT
     }
 
     @Override
-    protected boolean hasNextBinding() {
-        return IteratorTracked.track(taskInfo.getThrowableTracker(), super::hasNextBinding);
+    public boolean hasNext() {
+        return IteratorTracked.track(taskInfo.getThrowableTracker(), super::hasNext);
     }
 
     @Override
-    protected Binding moveToNextBinding() {
-        return IteratorTracked.track(taskInfo.getThrowableTracker(), super::moveToNextBinding);
+    public Binding next() {
+        return IteratorTracked.track(taskInfo.getThrowableTracker(), super::next);
+    }
+
+    @Override
+    public Binding nextBinding() {
+        return next();
     }
 
     @Override
     public void forEachRemaining(Consumer<? super Binding> action) {
-        IteratorTracked.trackForEachRemaining(taskInfo.getThrowableTracker(), iterator, action);
+        IteratorTracked.trackForEachRemaining(taskInfo.getThrowableTracker(), getDelegate(), action);
     }
 
     @Override
-    public final void requestCancel() {
-        taskInfo.transition(TaskState.TERMINATING, () -> super.requestCancel());
+    public void cancel() {
+        taskInfo.transition(TaskState.TERMINATING, () -> super.cancel());
     }
 
     @Override
-    public void closeIterator() {
+    public void close() {
         taskInfo.transition(TaskState.TERMINATING, null);
         try {
-            super.closeIterator();
+            super.close();
         } finally {
             taskInfo.transition(TaskState.TERMINATED, null);
         }
@@ -71,5 +80,21 @@ public class QueryIteratorTask extends QueryIteratorWrapper implements HasBasicT
     @Override
     public void abort() {
         cancel();
+    }
+
+    @Override
+    public void output(IndentedWriter out) {
+        out.write(Objects.toString(query));
+    }
+
+    @Override
+    public void output(IndentedWriter out, SerializationContext sCxt) {
+        out.write(Objects.toString(query));
+    }
+
+    @Override
+    public String toString() {
+        Throwable t = getTaskInfo().getThrowable().orElse(null);
+        return Objects.toString(query) + (t == null ? "" : t);
     }
 }
