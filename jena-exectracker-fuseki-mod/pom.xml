@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.aksw.jena.exectracker</groupId>
+    <artifactId>jena-exectracker-parent</artifactId>
+    <version>0.7.0</version>
+  </parent>
+
+  <artifactId>jena-exectracker-fuseki-mod</artifactId>
+
+  <name>Jena ExecTracker - Fuseki Mod</name>
+  <description>HTML Execution Tracker Module for Fuseki</description>
+
+  <properties>
+    <automatic.module.name>org.aksw.jena.fuseki.mod.exectracker</automatic.module.name>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.aksw.jena.exectracker</groupId>
+      <artifactId>jena-exectracker-arq</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.jena</groupId>
+      <artifactId>jena-fuseki-main</artifactId>
+      <!-- <scope>provided</scope> -->
+    </dependency>
+
+    <!-- Testing -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.junit.platform</groupId>
+      <artifactId>junit-platform-suite</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-slf4j2-impl</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-java</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>io.github.bonigarcia</groupId>
+      <artifactId>webdrivermanager</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>

@@ -1,0 +1,22 @@
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX schema: <http://schema.org/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX eg: <http://www.example.org/>
+
+PREFIX dbo: <http://dbpedia.org/ontology/>
+PREFIX dbr: <http://dbpedia.org/resource/>
+
+# This model is derived from: https://www.w3.org/TR/rdf11-primer/#section-triple
+
+eg:Bob
+  foaf:knows eg:Alice ;
+  foaf:topic_interest dbr:Mona_Lisa ;
+  schema:birthDate "1990-07-04"^^xsd:date ;
+  a foaf:Person .
+
+dbr:Mona_Lisa
+  dcterms:creator dbr:Leonardo_da_Vinci ;
+  dcterms:title "Mona Lisa" ;
+  a dbo:Work .
+

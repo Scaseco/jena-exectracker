@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.aksw.jena.exectracker</groupId>
+    <artifactId>jena-exectracker-parent</artifactId>
+    <version>0.7.0</version>
+  </parent>
+
+  <artifactId>jena-exectracker-pkg-fuseki-plugin</artifactId>
+  <name>Jena ExecTracker - Fuseki Mod - Plugin Packaging</name>
+
+  <properties>
+    <outputBaseName>jena-exectracker-fuseki-plugin-${project.version}</outputBaseName>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.aksw.jena.exectracker</groupId>
+      <artifactId>jena-exectracker-fuseki-mod</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-slf4j2-impl</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins> 
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <windowtitle>Jena ExecTracker - Fuseki Mod</windowtitle>
+          <doctitle>Jena ExecTracker - Fuseki Mod ${project.version}</doctitle>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-jar</id>
+            <phase>none</phase>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-install-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-install</id>
+            <phase>none</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>bundle</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.apache.jena</groupId>
+          <artifactId>jena-arq</artifactId>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.jena</groupId>
+          <artifactId>jena-fuseki-main</artifactId>
+          <scope>provided</scope>
+        </dependency>
+      </dependencies>
+      <build>  
+        <plugins>
+          <!-- jar file produced with this configuration gets intensionally overwritten by the shade plugin -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>default-jar</id>
+                <phase>package</phase>
+              </execution>
+            </executions>
+            <configuration>
+              <finalName>${outputBaseName}</finalName>
+              <!-- Skip manifest as shade will overwrite -->
+<!--              <archive>-->
+<!--                <manifest>-->
+<!--                  <addDefaultImplementationEntries>false</addDefaultImplementationEntries>-->
+<!--                  <addDefaultSpecificationEntries>false</addDefaultSpecificationEntries>-->
+<!--                </manifest>-->
+<!--              </archive>-->
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-shade-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>shade</goal>
+                </goals>
+                <configuration>
+                  <shadedArtifactAttached>false</shadedArtifactAttached>
+                  <outputFile>${project.build.directory}/${outputBaseName}.jar</outputFile>
+                  <transformers>
+                    <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+                    <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer" />
+                    <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer">
+                      <addHeader>false</addHeader>
+                    </transformer>
+                  </transformers>
+                  <filters>
+                    <filter>
+                      <excludes>
+                        <exclude>META-INF/*.SF</exclude>
+                        <exclude>META-INF/*.DSA</exclude>
+                        <exclude>META-INF/*.RSA</exclude>
+                        <exclude>META-INF/DEPENDENCIES</exclude>
+                        <exclude>META-INF/MANIFEST.MF</exclude>
+                        <exclude>**/module-info.class</exclude>
+                      </excludes>
+                    </filter>
+                  </filters>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>unpack-own-classes</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>unpack-own-classes</id>
+                <phase>generate-resources</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>${project.groupId}</groupId>
+                      <artifactId>${project.artifactId}</artifactId>
+                      <version>${project.version}</version>
+                      <type>jar</type>
+                      <overWrite>false</overWrite>
+                      <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+                    </artifactItem>
+                  </artifactItems>
+                  <overWriteIfNewer>false</overWriteIfNewer>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>

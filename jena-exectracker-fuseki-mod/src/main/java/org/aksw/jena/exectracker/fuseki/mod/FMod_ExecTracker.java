@@ -1,0 +1,135 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.aksw.jena.exectracker.fuseki.mod;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import org.aksw.jena.exectracker.arq.system.TaskEventBroker;
+import org.aksw.jena.exectracker.arq.system.TaskEventHistory;
+import org.apache.jena.fuseki.Fuseki;
+import org.apache.jena.fuseki.FusekiConfigException;
+import org.apache.jena.fuseki.main.FusekiServer;
+import org.apache.jena.fuseki.main.sys.FusekiAutoModule;
+import org.apache.jena.fuseki.server.DataAccessPoint;
+import org.apache.jena.fuseki.server.DataAccessPointRegistry;
+import org.apache.jena.fuseki.server.DataService;
+import org.apache.jena.fuseki.server.Endpoint;
+import org.apache.jena.fuseki.server.Operation;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.sparql.core.DatasetGraph;
+import org.apache.jena.sparql.util.Context;
+import org.apache.jena.sparql.util.Symbol;
+
+/** FMod_ExecTracker - Fuseki module for execution tracking integration. */
+public class FMod_ExecTracker implements FusekiAutoModule {
+    /** Namespace constant. */
+    public static final String NS = "https://w3id.org/aksw/jena/exectracker/fuseki#";
+
+    /** Symbol constant. */
+    public static final Symbol symAllowAbort = Symbol.create(NS + "allowAbort");
+
+    private static final Operation OPERATION =
+            Operation.alloc(NS + "exectracker", "ExecTracker", "Execution Tracker");
+
+    /**
+     * Get the ExecTracker operation.
+     *
+     * @return the operation
+     */
+    public static Operation getOperation() {
+        return OPERATION;
+    }
+
+    /** Constructor that creates a new FMod_ExecTracker instance. */
+    public FMod_ExecTracker() {
+        super();
+    }
+
+    @Override
+    public String name() {
+        return "ExecTracker";
+    }
+
+    @Override
+    public void prepare(FusekiServer.Builder builder, Set<String> datasetNames, Model configModel) {
+        Operation trackerOperation = getOperation();
+        Fuseki.configLog.info(name() + ": Registering operation " + trackerOperation.getId());
+        builder.registerOperation(trackerOperation, new ExecTrackerService());
+    }
+
+    /** For each dataset with a 'tracker' endpoint set up a task event broker. */
+    @Override
+    public void configured(
+            FusekiServer.Builder serverBuilder, DataAccessPointRegistry dapRegistry, Model configModel) {
+        FusekiAutoModule.super.configured(serverBuilder, dapRegistry, configModel);
+
+        Operation trackerOperation = getOperation();
+        List<DataAccessPoint> newDataAccessPoints = new ArrayList<>();
+        for (DataAccessPoint dap : dapRegistry.accessPoints()) {
+            DataService dataService = dap.getDataService();
+            DatasetGraph dsg = dataService.getDataset();
+
+            List<Endpoint> trackerEndpoints =
+                    Optional.ofNullable(dataService.getEndpoints(trackerOperation)).orElse(List.of());
+
+            if (!trackerEndpoints.isEmpty()) {
+                // Register a task tracker registry in the dataset context.
+                Context datasetCxt = dsg.getContext();
+                if (datasetCxt != null) {
+                    TaskEventBroker taskTrackerRegistry = TaskEventBroker.getOrCreate(datasetCxt);
+
+                    // Then register task trackers with history into the endpoint context.
+                    for (Endpoint endpoint : trackerEndpoints) {
+                        String endpointLabel = dap.getName() + "/" + endpoint.getName();
+                        Fuseki.configLog.info(endpointLabel + ": Setting up ExecTracker.");
+                        Context endpointCxt = endpoint.getContext();
+                        if (endpointCxt == null) {
+                            // XXX Could we set up our own endpoint copy that ensures a non-null context?
+                            throw new FusekiConfigException(
+                                    endpointLabel
+                                            + ": Cannot register exec tracker because context is null. "
+                                            + "Try adding an empty context to your cofiguration: <your-service> fuseki:endpoint [ ja:context [ ] ] .");
+                        }
+
+                        TaskEventHistory historyTracker = TaskEventHistory.getOrCreate(endpointCxt);
+                        historyTracker.connect(taskTrackerRegistry);
+                        // XXX Should disconnect history tracker on server shutdown.
+                    }
+                }
+            } else {
+                newDataAccessPoints.add(dap);
+            }
+        }
+
+        // "replace" each DataAccessPoint
+        newDataAccessPoints.forEach(
+                dap -> {
+                    dapRegistry.remove(dap.getName());
+                    dapRegistry.register(dap);
+                });
+    }
+
+    @Override
+    public void serverStopped(FusekiServer server) {
+        // XXX Should disconnect history tracker on server shutdown.
+    }
+}
