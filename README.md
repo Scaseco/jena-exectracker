@@ -85,11 +85,21 @@ Add the following dependency to your project:
 <dependency>
   <groupId>org.aksw.jena.exectracker</groupId>
   <artifactId>jena-exectracker-arq</artifactId>
-  <version>0.1.0-SNAPSHOT</version>
+  <version>0.7.0-SNAPSHOT</version>
 </dependency>
 ```
 
-The library is tested against Apache Jena 6.0.0.
+### Version Compatibility
+
+Versions of this project were built against the versions of Apache Jena as shown in the following table.
+
+| jena-exectracker | Apache Jena |
+|------------------|-------------|
+|            0.7.0 |      6.0.0  |
+
+Mixing versions may or may not work.
+
+### Example
 
 ```java
 public class ExampleExecTracker {
