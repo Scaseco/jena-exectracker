@@ -136,7 +136,7 @@ QueryEngineRegistry.get().add(new QueryEngineFactoryExecTracker());
 UpdateEngineRegistry.get().add(new UpdateEngineFactoryExecTracker());
 ```
 
-The registration check intercepts query and update executions and checks for whether there is a broker in the context. A broker is both an event listener and an event source - i.e. it is an event distributor. If so, the broker is notified of the execution.
+The registration intercepts query and update executions and checks for whether there is a broker in the context. A broker is both an event listener and an event source - i.e. it is an event distributor. If so, the broker is notified of the execution.
 
 ## Build from Source
 
