@@ -22,8 +22,9 @@ import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Map.Entry;
-import org.aksw.jenax.sparql.exec.tracker.system.HasBasicTaskExec;
-import org.aksw.jenax.sparql.exec.tracker.system.TaskEventHistory;
+
+import org.aksw.jena.exectracker.arq.system.HasBasicTaskExec;
+import org.aksw.jena.exectracker.arq.system.TaskEventHistory;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 /** TaskStatusWriter - Writes execution tracker state as JSON. */

@@ -19,40 +19,35 @@
  *   SPDX-License-Identifier: Apache-2.0
  */
 
-package org.aksw.jenax.sparql.exec.tracker.core;
+package org.aksw.jena.exectracker.arq.core;
 
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Optional;
 
-/** ThrowableTrackerFirst - Tracks only the first throwable reported, ignoring subsequent ones. */
-public class ThrowableTrackerFirst implements ThrowableTracker {
-    /** ThrowableTrackerFirst constructor. */
-    public ThrowableTrackerFirst() {}
-
-    /** The first throwable reported, or null if none. */
-    protected Throwable throwable = null;
-
+/** ThrowableTracker - Interface for tracking throwables encountered during execution. */
+public interface ThrowableTracker {
     /**
-     * Report a throwable, keeping only the first one.
+     * Report a throwable that was encountered.
      *
      * @param throwable the throwable to report
      */
-    @Override
-    public void report(Throwable throwable) {
-        if (this.throwable == null) {
-            this.throwable = throwable;
-        }
-        // Ignore any throwables after the first
-    }
+    void report(Throwable throwable);
 
     /**
-     * Get an iterator over reported throwables (at most one).
+     * Get all reported throwables.
      *
      * @return iterator of throwables
      */
-    @Override
-    public Iterator<Throwable> getThrowables() {
-        return throwable == null ? Collections.emptyIterator() : List.of(throwable).iterator();
+    Iterator<Throwable> getThrowables();
+
+    /**
+     * Get the first throwable if any.
+     *
+     * @return optional first throwable
+     */
+    default Optional<Throwable> getFirstThrowable() {
+        Iterator<Throwable> it = getThrowables();
+        Throwable throwable = it.hasNext() ? it.next() : null;
+        return Optional.ofNullable(throwable);
     }
 }

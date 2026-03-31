@@ -19,19 +19,23 @@
  *   SPDX-License-Identifier: Apache-2.0
  */
 
-package org.aksw.jenax.sparql.exec.tracker.system;
+package org.aksw.jena.exectracker.arq.unused;
+
+import org.apache.jena.sparql.exec.UpdateExec;
 
 /**
- * HasBasicTaskExec - Interface implemented by objects that have basic task execution information.
+ * UpdateExecWrapper - Wrapper for UpdateExec that delegates to an underlying instance.
+ *
+ * @param <T> the delegate UpdateExec type
  */
-public interface HasBasicTaskExec {
+public class UpdateExecWrapper<T extends UpdateExec> extends UpdateProcessorWrapper<T>
+        implements UpdateExec {
     /**
-     * Get basic task information.
+     * Create a new UpdateExecWrapper.
      *
-     * @return task info
+     * @param delegate the delegate UpdateExec
      */
-    BasicTaskInfo getTaskInfo();
-
-    /** Abort the task execution. */
-    void abort();
+    public UpdateExecWrapper(T delegate) {
+        super(delegate);
+    }
 }

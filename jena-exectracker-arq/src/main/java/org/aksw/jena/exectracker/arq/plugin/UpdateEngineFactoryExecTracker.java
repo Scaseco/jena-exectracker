@@ -1,6 +1,6 @@
 package org.aksw.jena.exectracker.arq.plugin;
 
-import org.aksw.jenax.sparql.exec.tracker.system.TaskEventBroker;
+import org.aksw.jena.exectracker.arq.system.TaskEventBroker;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.modify.UpdateEngine;
 import org.apache.jena.sparql.modify.UpdateEngineFactory;

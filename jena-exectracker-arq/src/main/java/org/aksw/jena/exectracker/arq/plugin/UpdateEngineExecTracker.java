@@ -2,11 +2,12 @@ package org.aksw.jena.exectracker.arq.plugin;
 
 import java.time.Instant;
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.aksw.jenax.sparql.exec.tracker.system.BasicTaskInfo;
-import org.aksw.jenax.sparql.exec.tracker.system.BasicTaskInfoImpl;
-import org.aksw.jenax.sparql.exec.tracker.system.HasBasicTaskExec;
-import org.aksw.jenax.sparql.exec.tracker.system.TaskListener;
-import org.aksw.jenax.sparql.exec.tracker.system.TaskState;
+
+import org.aksw.jena.exectracker.arq.system.BasicTaskInfo;
+import org.aksw.jena.exectracker.arq.system.BasicTaskInfoImpl;
+import org.aksw.jena.exectracker.arq.system.HasBasicTaskExec;
+import org.aksw.jena.exectracker.arq.system.TaskListener;
+import org.aksw.jena.exectracker.arq.system.TaskState;
 import org.apache.jena.sparql.modify.UpdateEngine;
 import org.apache.jena.sparql.util.Context;
 

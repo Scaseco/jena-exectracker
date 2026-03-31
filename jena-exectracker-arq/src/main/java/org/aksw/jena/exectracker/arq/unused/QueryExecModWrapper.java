@@ -19,7 +19,7 @@
  *   SPDX-License-Identifier: Apache-2.0
  */
 
-package org.aksw.jenax.sparql.exec.tracker.unused;
+package org.aksw.jena.exectracker.arq.unused;
 
 import java.util.concurrent.TimeUnit;
 import org.apache.jena.sparql.exec.QueryExec;

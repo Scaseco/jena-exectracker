@@ -19,23 +19,14 @@
  *   SPDX-License-Identifier: Apache-2.0
  */
 
-package org.aksw.jenax.sparql.exec.tracker.unused;
+package org.aksw.jena.exectracker.arq.system;
 
-import org.apache.jena.sparql.exec.UpdateExec;
+import org.apache.jena.sparql.engine.iterator.Abortable;
 
 /**
- * UpdateExecWrapper - Wrapper for UpdateExec that delegates to an underlying instance.
- *
- * @param <T> the delegate UpdateExec type
+ * Interface for tasks that can execute once - i.e. not periodic ones. Combines task information
+ * with cancellation.
  */
-public class UpdateExecWrapper<T extends UpdateExec> extends UpdateProcessorWrapper<T>
-        implements UpdateExec {
-    /**
-     * Create a new UpdateExecWrapper.
-     *
-     * @param delegate the delegate UpdateExec
-     */
-    public UpdateExecWrapper(T delegate) {
-        super(delegate);
-    }
-}
+public interface BasicTaskExec
+        extends BasicTaskInfo, Abortable // XXX Abortable is in iterator package - not ideal.
+{}

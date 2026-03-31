@@ -19,13 +19,14 @@
  *   SPDX-License-Identifier: Apache-2.0
  */
 
-package org.aksw.jenax.sparql.exec.tracker.unused;
+package org.aksw.jena.exectracker.arq.unused;
 
 import java.util.Iterator;
 import java.util.function.Supplier;
-import org.aksw.jenax.sparql.exec.tracker.core.IteratorTracked;
-import org.aksw.jenax.sparql.exec.tracker.core.RowSetTracked;
-import org.aksw.jenax.sparql.exec.tracker.core.ThrowableTracker;
+
+import org.aksw.jena.exectracker.arq.core.IteratorTracked;
+import org.aksw.jena.exectracker.arq.core.RowSetTracked;
+import org.aksw.jena.exectracker.arq.core.ThrowableTracker;
 import org.apache.jena.atlas.json.JsonArray;
 import org.apache.jena.atlas.json.JsonObject;
 import org.apache.jena.graph.Graph;

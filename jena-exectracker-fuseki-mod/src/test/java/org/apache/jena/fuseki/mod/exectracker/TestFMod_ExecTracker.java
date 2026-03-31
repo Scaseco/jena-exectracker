@@ -22,10 +22,11 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.stream.IntStream;
+
+import org.aksw.jena.exectracker.arq.system.TaskEventBroker;
+import org.aksw.jena.exectracker.arq.system.TaskEventHistory;
 import org.aksw.jena.exectracker.fuseki.mod.ExecTrackerService;
 import org.aksw.jena.exectracker.fuseki.mod.FMod_ExecTracker;
-import org.aksw.jenax.sparql.exec.tracker.system.TaskEventBroker;
-import org.aksw.jenax.sparql.exec.tracker.system.TaskEventHistory;
 import org.apache.jena.fuseki.main.FusekiMain;
 import org.apache.jena.fuseki.main.FusekiServer;
 import org.apache.jena.fuseki.server.DataService;

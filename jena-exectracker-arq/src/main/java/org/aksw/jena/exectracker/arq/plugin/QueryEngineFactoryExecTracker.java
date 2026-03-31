@@ -1,10 +1,11 @@
 package org.aksw.jena.exectracker.arq.plugin;
 
 import java.util.Objects;
-import org.aksw.jenax.sparql.exec.tracker.core.ThrowableTracker;
-import org.aksw.jenax.sparql.exec.tracker.core.ThrowableTrackerFirst;
-import org.aksw.jenax.sparql.exec.tracker.system.QueryIteratorTask;
-import org.aksw.jenax.sparql.exec.tracker.system.TaskEventBroker;
+
+import org.aksw.jena.exectracker.arq.core.ThrowableTracker;
+import org.aksw.jena.exectracker.arq.core.ThrowableTrackerFirst;
+import org.aksw.jena.exectracker.arq.system.QueryIteratorTask;
+import org.aksw.jena.exectracker.arq.system.TaskEventBroker;
 import org.apache.jena.query.Query;
 import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.algebra.OpAsQuery;

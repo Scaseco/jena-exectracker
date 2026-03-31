@@ -19,46 +19,44 @@
  *   SPDX-License-Identifier: Apache-2.0
  */
 
-package org.aksw.jenax.sparql.exec.tracker.core;
+package org.aksw.jena.exectracker.arq.unused;
 
-import org.apache.jena.update.UpdateProcessor;
+import org.apache.jena.sparql.exec.UpdateExec;
 import org.apache.jena.update.UpdateRequest;
 
-/**
- * UpdateProcessorWrapper - Wrapper for UpdateProcessor that delegates to an underlying instance.
- *
- * @param <T> the delegate UpdateProcessor type
- */
-public class UpdateProcessorWrapper<T extends UpdateProcessor> implements UpdateProcessor {
-    private T delegate;
+/** UpdateExecBase - Base implementation for tracked SPARQL update execution. */
+public abstract class UpdateExecBase implements UpdateExec {
+    /** The string representation of the update request. */
+    protected String updateRequestString;
+
+    /** The parsed update request. */
+    protected UpdateRequest updateRequest;
 
     /**
-     * Create a new UpdateProcessorWrapper.
+     * Create a new UpdateExecBase.
      *
-     * @param delegate the delegate UpdateProcessor
+     * @param updateRequest parsed update request
+     * @param updateRequestString string representation of update request
      */
-    public UpdateProcessorWrapper(T delegate) {
+    public UpdateExecBase(UpdateRequest updateRequest, String updateRequestString) {
         super();
-        this.delegate = delegate;
+        // this.datasetGraph = datasetGraph;
+        this.updateRequest = updateRequest;
+        this.updateRequestString = updateRequestString;
     }
 
-    /**
-     * Get the underlying delegate UpdateProcessor.
-     *
-     * @return the delegate
-     */
-    protected T getDelegate() {
-        return delegate;
-    }
+    //    public DatasetGraph getDatasetGraph() {
+    //        return datasetGraph;
+    //    }
 
     /**
-     * Get the update request being processed.
+     * Get parsed update request.
      *
      * @return update request
      */
     @Override
     public UpdateRequest getUpdateRequest() {
-        return getDelegate().getUpdateRequest();
+        return updateRequest;
     }
 
     /**
@@ -68,12 +66,6 @@ public class UpdateProcessorWrapper<T extends UpdateProcessor> implements Update
      */
     @Override
     public String getUpdateRequestString() {
-        return getDelegate().getUpdateRequestString();
-    }
-
-    /** Execute the wrapped update processor. */
-    @Override
-    public void execute() {
-        getDelegate().execute();
+        return updateRequestString;
     }
 }

@@ -19,18 +19,25 @@
  *   SPDX-License-Identifier: Apache-2.0
  */
 
-package org.aksw.jenax.sparql.exec.tracker.system;
+package org.aksw.jena.exectracker.arq.system;
 
-/**
- * Callback interface for task state change events.
- *
- * @param <T> the type of task being listened to
- */
-public interface TaskListener<T extends HasBasicTaskExec> {
+/** TaskState - Enumerates the states in a task's lifecycle. */
+public enum TaskState {
+    /** Task object has been created but not yet started. */
+    CREATED,
+
+    /** A method semantically akin to beforeRun() or init() has been called. */
+    STARTING,
+
     /**
-     * Called when a task's state changes.
-     *
-     * @param task the task that changed state
+     * A method semantically akin to run() has been called. This implies that the beforeRun() method
+     * has completed.
      */
-    void onStateChange(T task);
+    RUNNING,
+
+    /** A method semantically akin to afterRun() or close() has been called but not completed yet. */
+    TERMINATING,
+
+    /** A method semantically akin to afterRun() or close() has completed. */
+    TERMINATED
 }

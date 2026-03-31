@@ -19,7 +19,7 @@
  *   SPDX-License-Identifier: Apache-2.0
  */
 
-package org.aksw.jenax.sparql.exec.tracker.unused;
+package org.aksw.jena.exectracker.arq.unused;
 
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;

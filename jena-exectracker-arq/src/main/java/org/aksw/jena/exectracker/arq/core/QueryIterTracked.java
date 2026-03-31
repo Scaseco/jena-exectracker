@@ -1,4 +1,4 @@
-package org.aksw.jenax.sparql.exec.tracker.core;
+package org.aksw.jena.exectracker.arq.core;
 
 import java.util.Objects;
 import java.util.function.Consumer;

@@ -19,25 +19,19 @@
  *   SPDX-License-Identifier: Apache-2.0
  */
 
-package org.aksw.jenax.sparql.exec.tracker.system;
+package org.aksw.jena.exectracker.arq.system;
 
-/** TaskState - Enumerates the states in a task's lifecycle. */
-public enum TaskState {
-    /** Task object has been created but not yet started. */
-    CREATED,
-
-    /** A method semantically akin to beforeRun() or init() has been called. */
-    STARTING,
-
+/**
+ * HasBasicTaskExec - Interface implemented by objects that have basic task execution information.
+ */
+public interface HasBasicTaskExec {
     /**
-     * A method semantically akin to run() has been called. This implies that the beforeRun() method
-     * has completed.
+     * Get basic task information.
+     *
+     * @return task info
      */
-    RUNNING,
+    BasicTaskInfo getTaskInfo();
 
-    /** A method semantically akin to afterRun() or close() has been called but not completed yet. */
-    TERMINATING,
-
-    /** A method semantically akin to afterRun() or close() has completed. */
-    TERMINATED
+    /** Abort the task execution. */
+    void abort();
 }

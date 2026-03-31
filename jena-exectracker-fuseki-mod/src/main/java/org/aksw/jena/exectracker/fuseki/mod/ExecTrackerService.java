@@ -41,9 +41,10 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import org.aksw.jenax.sparql.exec.tracker.system.HasBasicTaskExec;
-import org.aksw.jenax.sparql.exec.tracker.system.TaskEventHistory;
-import org.aksw.jenax.sparql.exec.tracker.system.TaskListener;
+
+import org.aksw.jena.exectracker.arq.system.HasBasicTaskExec;
+import org.aksw.jena.exectracker.arq.system.TaskEventHistory;
+import org.aksw.jena.exectracker.arq.system.TaskListener;
 import org.apache.commons.io.IOUtils;
 import org.apache.jena.fuseki.FusekiException;
 import org.apache.jena.fuseki.server.Endpoint;

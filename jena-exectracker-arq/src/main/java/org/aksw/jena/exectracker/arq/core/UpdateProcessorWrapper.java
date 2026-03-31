@@ -19,44 +19,46 @@
  *   SPDX-License-Identifier: Apache-2.0
  */
 
-package org.aksw.jenax.sparql.exec.tracker.unused;
+package org.aksw.jena.exectracker.arq.core;
 
-import org.apache.jena.sparql.exec.UpdateExec;
+import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 
-/** UpdateExecBase - Base implementation for tracked SPARQL update execution. */
-public abstract class UpdateExecBase implements UpdateExec {
-    /** The string representation of the update request. */
-    protected String updateRequestString;
-
-    /** The parsed update request. */
-    protected UpdateRequest updateRequest;
+/**
+ * UpdateProcessorWrapper - Wrapper for UpdateProcessor that delegates to an underlying instance.
+ *
+ * @param <T> the delegate UpdateProcessor type
+ */
+public class UpdateProcessorWrapper<T extends UpdateProcessor> implements UpdateProcessor {
+    private T delegate;
 
     /**
-     * Create a new UpdateExecBase.
+     * Create a new UpdateProcessorWrapper.
      *
-     * @param updateRequest parsed update request
-     * @param updateRequestString string representation of update request
+     * @param delegate the delegate UpdateProcessor
      */
-    public UpdateExecBase(UpdateRequest updateRequest, String updateRequestString) {
+    public UpdateProcessorWrapper(T delegate) {
         super();
-        // this.datasetGraph = datasetGraph;
-        this.updateRequest = updateRequest;
-        this.updateRequestString = updateRequestString;
+        this.delegate = delegate;
     }
 
-    //    public DatasetGraph getDatasetGraph() {
-    //        return datasetGraph;
-    //    }
+    /**
+     * Get the underlying delegate UpdateProcessor.
+     *
+     * @return the delegate
+     */
+    protected T getDelegate() {
+        return delegate;
+    }
 
     /**
-     * Get parsed update request.
+     * Get the update request being processed.
      *
      * @return update request
      */
     @Override
     public UpdateRequest getUpdateRequest() {
-        return updateRequest;
+        return getDelegate().getUpdateRequest();
     }
 
     /**
@@ -66,6 +68,12 @@ public abstract class UpdateExecBase implements UpdateExec {
      */
     @Override
     public String getUpdateRequestString() {
-        return updateRequestString;
+        return getDelegate().getUpdateRequestString();
+    }
+
+    /** Execute the wrapped update processor. */
+    @Override
+    public void execute() {
+        getDelegate().execute();
     }
 }

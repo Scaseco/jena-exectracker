@@ -19,7 +19,7 @@
  *   SPDX-License-Identifier: Apache-2.0
  */
 
-package org.aksw.jenax.sparql.exec.tracker.system;
+package org.aksw.jena.exectracker.arq.system;
 
 import java.time.Instant;
 import java.util.Optional;

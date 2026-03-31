@@ -22,8 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import org.aksw.jenax.sparql.exec.tracker.system.TaskEventBroker;
-import org.aksw.jenax.sparql.exec.tracker.system.TaskEventHistory;
+
+import org.aksw.jena.exectracker.arq.system.TaskEventBroker;
+import org.aksw.jena.exectracker.arq.system.TaskEventHistory;
 import org.apache.jena.fuseki.Fuseki;
 import org.apache.jena.fuseki.FusekiConfigException;
 import org.apache.jena.fuseki.main.FusekiServer;

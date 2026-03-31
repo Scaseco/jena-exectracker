@@ -19,7 +19,7 @@
  *   SPDX-License-Identifier: Apache-2.0
  */
 
-package org.aksw.jenax.sparql.exec.tracker.system;
+package org.aksw.jena.exectracker.arq.system;
 
 /**
  * TaskListenerByState - Callback interface that routes task state changes to state-specific

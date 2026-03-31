@@ -19,14 +19,18 @@
  *   SPDX-License-Identifier: Apache-2.0
  */
 
-package org.aksw.jenax.sparql.exec.tracker.system;
-
-import org.apache.jena.sparql.engine.iterator.Abortable;
+package org.aksw.jena.exectracker.arq.system;
 
 /**
- * Interface for tasks that can execute once - i.e. not periodic ones. Combines task information
- * with cancellation.
+ * Callback interface for task state change events.
+ *
+ * @param <T> the type of task being listened to
  */
-public interface BasicTaskExec
-        extends BasicTaskInfo, Abortable // XXX Abortable is in iterator package - not ideal.
-{}
+public interface TaskListener<T extends HasBasicTaskExec> {
+    /**
+     * Called when a task's state changes.
+     *
+     * @param task the task that changed state
+     */
+    void onStateChange(T task);
+}

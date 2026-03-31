@@ -1,9 +1,10 @@
-package org.aksw.jenax.sparql.exec.tracker.system;
+package org.aksw.jena.exectracker.arq.system;
 
 import java.time.Instant;
 import java.util.Objects;
 import java.util.function.Consumer;
-import org.aksw.jenax.sparql.exec.tracker.core.IteratorTracked;
+
+import org.aksw.jena.exectracker.arq.core.IteratorTracked;
 import org.apache.jena.query.Query;
 import org.apache.jena.sparql.engine.QueryIterator;
 import org.apache.jena.sparql.engine.binding.Binding;

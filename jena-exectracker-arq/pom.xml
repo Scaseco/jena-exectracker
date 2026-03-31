@@ -6,7 +6,8 @@
 
 	<artifactId>jena-exectracker-arq</artifactId>
 	<name>Jena ExecTracker - ARQ</name>
-	<description>Core classes and hooks into ARQ's QueryEngineRegistry and UpdateEngineRegistry</description>
+	<description>Core classes and hooks into ARQ's QueryEngineRegistry and
+		UpdateEngineRegistry</description>
 	<packaging>jar</packaging>
 
 	<parent>
@@ -16,10 +17,10 @@
 	</parent>
 
 	<dependencies>
-  <dependency>
-      <groupId>org.apache.jena</groupId>
-      <artifactId>jena-arq</artifactId>
-    </dependency>
+		<dependency>
+			<groupId>org.apache.jena</groupId>
+			<artifactId>jena-arq</artifactId>
+		</dependency>
 
 		<!-- Unit Testing -->
 

@@ -1,11 +1,12 @@
-package org.aksw.jenax.sparql.exec.tracker.system;
+package org.aksw.jena.exectracker.arq.system;
 
 import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
-import org.aksw.jenax.sparql.exec.tracker.core.ThrowableTracker;
-import org.aksw.jenax.sparql.exec.tracker.core.ThrowableTrackerFirst;
+
+import org.aksw.jena.exectracker.arq.core.ThrowableTracker;
+import org.aksw.jena.exectracker.arq.core.ThrowableTrackerFirst;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
