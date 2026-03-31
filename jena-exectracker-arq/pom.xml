@@ -13,7 +13,7 @@
 	<parent>
 		<groupId>org.aksw.jena.exectracker</groupId>
 		<artifactId>jena-exectracker-parent</artifactId>
-		<version>0.7.0</version>
+		<version>0.7.1-SNAPSHOT</version>
 	</parent>
 
 	<dependencies>
