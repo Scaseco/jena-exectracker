@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>jena-exectracker-pkg-fuseki-plugin</artifactId>
-  <name>Jena ExecTracker - Fuseki Mod - Plugin Packaging</name>
+  <name>Jena ExecTracker - Fuseki Plugin JAR</name>
 
   <properties>
     <outputBaseName>jena-exectracker-fuseki-plugin-${project.version}</outputBaseName>
@@ -36,6 +36,14 @@
 
   <build>
     <plugins> 
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>

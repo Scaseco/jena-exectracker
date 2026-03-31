@@ -29,7 +29,7 @@ The `make setup-example` command:
 
 1. Downloads Apache Jena Fuseki 6.0.0
 2. Copies the ExecTracker Fuseki plugin JAR to Fuseki's `run/extra/` directory
-3. Installs the configuration files (`config.ttl`, `passwd.txt`, `exectracker-demo_ds.ttl`, `mona-lisa.ttl`)
+3. Installs the configuration files (`config.ttl`, `passwd.txt`, `example-exectracker.service.ttl`, `mona-lisa.ttl`)
 4. Sets up the example RDF data
 
 ### Configuration

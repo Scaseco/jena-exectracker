@@ -49,7 +49,7 @@ copy-example-config: setup-fuseki
 	# Note: "--update=none" means "Do not overwrite existing files"
 	cp --update=none config.ttl $(FUSEKI_BASE)/run
 	cp --update=none passwd.txt $(FUSEKI_BASE)/run
-	cp --update=none exectracker-demo_ds.ttl "$(FUSEKI_BASE)/run/configuration"
+	cp --update=none example-exectracker.service.ttl "$(FUSEKI_BASE)/run/configuration"
 	mkdir -p "$(FUSEKI_BASE)/run/content"
 	cp --update=none mona-lisa.ttl "$(FUSEKI_BASE)/run/content"
 
