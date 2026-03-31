@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.aksw.jena.exectracker</groupId>
 	<artifactId>jena-exectracker-parent</artifactId>
-	<version>0.1.0-SNAPSHOT</version>
+	<version>0.7.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>Jena ExecTracker - Parent</name>
@@ -57,9 +57,9 @@
 		<maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
 		<maven-source-plugin.version>3.4.0</maven-source-plugin.version>
 		<maven-deploy-plugin.version>3.1.4</maven-deploy-plugin.version>
-		<maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
+		<maven-jar-plugin.version>3.5.0</maven-jar-plugin.version>
 		<maven-war-plugin.version>3.5.1</maven-war-plugin.version>
-		<maven-install-plugin.version>3.1.2</maven-install-plugin.version>
+		<maven-install-plugin.version>3.1.4</maven-install-plugin.version>
 		<maven-dependency-plugin.version>3.0.2</maven-dependency-plugin.version>
 
 		<lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
@@ -317,12 +317,6 @@
 		</plugins>
 		<pluginManagement>
 			<plugins>
-				<plugin>
-					<groupId>org.vafer</groupId>
-					<artifactId>jdeb</artifactId>
-					<version>${jdeb.version}</version>
-				</plugin>
-
 				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
