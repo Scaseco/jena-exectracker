@@ -62,10 +62,10 @@
 		<maven-install-plugin.version>3.1.4</maven-install-plugin.version>
 		<maven-dependency-plugin.version>3.0.2</maven-dependency-plugin.version>
 
-		<lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
-
 		<spotless-maven-plugin.version>3.4.0</spotless-maven-plugin.version>
 		<google-java-format.version>1.35.0</google-java-format.version>
+
+		<lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
 
 		<!-- Project Settings -->
 		<maven.compiler.release>21</maven.compiler.release>
