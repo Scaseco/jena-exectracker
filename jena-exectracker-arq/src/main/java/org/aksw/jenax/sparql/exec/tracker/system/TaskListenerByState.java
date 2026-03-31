@@ -21,20 +21,39 @@
 
 package org.aksw.jenax.sparql.exec.tracker.system;
 
-public interface TaskListenerByState<T extends HasBasicTaskExec>
-    extends TaskListener<T>
-{
+/**
+ * TaskListenerByState - Callback interface that routes task state changes to state-specific
+ * handlers.
+ *
+ * @param <T> the type of task being listened to
+ */
+public interface TaskListenerByState<T extends HasBasicTaskExec> extends TaskListener<T> {
     @Override
     public default void onStateChange(T task) {
         switch (task.getTaskInfo().getTaskState()) {
-        case CREATED: onCreated(task); break;
-        case TERMINATED: onTerminated(task); break;
-        default:
-            // Log warning?
-            break;
+            case CREATED:
+                onCreated(task);
+                break;
+            case TERMINATED:
+                onTerminated(task);
+                break;
+            default:
+                // Log warning?
+                break;
         }
     }
 
+    /**
+     * Called when a task is created.
+     *
+     * @param task the task that was created
+     */
     public void onCreated(T task);
+
+    /**
+     * Called when a task is terminated.
+     *
+     * @param task the task that was terminated
+     */
     public void onTerminated(T task);
 }

@@ -7,9 +7,13 @@ import org.apache.jena.sparql.engine.Plan;
 import org.apache.jena.sparql.engine.QueryIterator;
 import org.apache.jena.sparql.serializer.SerializationContext;
 
-public interface PlanWrapper
-    extends Plan
-{
+/** Wrapper interface for Plan objects that delegates to underlying Plan. */
+public interface PlanWrapper extends Plan {
+    /**
+     * Get the delegate Plan.
+     *
+     * @return the delegate plan
+     */
     Plan getDelegate();
 
     @Override

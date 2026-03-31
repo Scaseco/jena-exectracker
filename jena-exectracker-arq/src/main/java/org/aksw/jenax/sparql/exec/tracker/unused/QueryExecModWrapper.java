@@ -22,28 +22,48 @@
 package org.aksw.jenax.sparql.exec.tracker.unused;
 
 import java.util.concurrent.TimeUnit;
-
 import org.apache.jena.sparql.exec.QueryExec;
 import org.apache.jena.sparql.exec.QueryExecMod;
 import org.apache.jena.sparql.util.Context;
 
+/**
+ * Wrapper for QueryExecMod that delegates to an underlying instance.
+ *
+ * @param <X> the self type
+ * @param <T> the delegate QueryExecMod type
+ */
 public class QueryExecModWrapper<X extends QueryExecMod, T extends QueryExecMod>
-    implements QueryExecMod
-{
+        implements QueryExecMod {
+    /** The underlying QueryExecMod instance being wrapped. */
     protected T delegate;
 
+    /**
+     * Create a new QueryExecModWrapper.
+     *
+     * @param delegate the delegate QueryExecMod
+     */
     public QueryExecModWrapper(T delegate) {
         super();
         this.delegate = delegate;
     }
 
+    /**
+     * Get the underlying delegate QueryExecMod.
+     *
+     * @return the delegate
+     */
     protected T getDelegate() {
         return delegate;
     }
 
+    /**
+     * Return this instance cast to the self type.
+     *
+     * @return this instance as type X
+     */
     @SuppressWarnings("unchecked")
     public X self() {
-        return (X)this;
+        return (X) this;
     }
 
     @Override

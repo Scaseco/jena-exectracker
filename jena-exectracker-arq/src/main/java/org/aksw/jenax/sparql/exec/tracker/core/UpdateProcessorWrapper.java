@@ -24,30 +24,54 @@ package org.aksw.jenax.sparql.exec.tracker.core;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 
-public class UpdateProcessorWrapper<T extends UpdateProcessor>
-    implements UpdateProcessor
-{
+/**
+ * UpdateProcessorWrapper - Wrapper for UpdateProcessor that delegates to an underlying instance.
+ *
+ * @param <T> the delegate UpdateProcessor type
+ */
+public class UpdateProcessorWrapper<T extends UpdateProcessor> implements UpdateProcessor {
     private T delegate;
 
+    /**
+     * Create a new UpdateProcessorWrapper.
+     *
+     * @param delegate the delegate UpdateProcessor
+     */
     public UpdateProcessorWrapper(T delegate) {
         super();
         this.delegate = delegate;
     }
 
+    /**
+     * Get the underlying delegate UpdateProcessor.
+     *
+     * @return the delegate
+     */
     protected T getDelegate() {
         return delegate;
     }
 
+    /**
+     * Get the update request being processed.
+     *
+     * @return update request
+     */
     @Override
     public UpdateRequest getUpdateRequest() {
         return getDelegate().getUpdateRequest();
     }
 
+    /**
+     * Get string representation of update request.
+     *
+     * @return update request string
+     */
     @Override
     public String getUpdateRequestString() {
         return getDelegate().getUpdateRequestString();
     }
 
+    /** Execute the wrapped update processor. */
     @Override
     public void execute() {
         getDelegate().execute();

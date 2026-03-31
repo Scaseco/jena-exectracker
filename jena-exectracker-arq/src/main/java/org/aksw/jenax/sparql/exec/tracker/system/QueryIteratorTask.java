@@ -3,22 +3,31 @@ package org.aksw.jenax.sparql.exec.tracker.system;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.function.Consumer;
-
 import org.aksw.jenax.sparql.exec.tracker.core.IteratorTracked;
 import org.apache.jena.query.Query;
 import org.apache.jena.sparql.engine.QueryIterator;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.engine.iterator.QueryIteratorWrapper;
 
-public class QueryIteratorTask
-    extends QueryIteratorWrapper
-    implements HasBasicTaskExec
-{
+/**
+ * Wraps a QueryIterator with full task lifecycle management including state tracking and exception
+ * handling.
+ */
+public class QueryIteratorTask extends QueryIteratorWrapper implements HasBasicTaskExec {
     private BasicTaskInfoImpl<QueryIteratorTask> taskInfo;
 
-    public QueryIteratorTask(Query query, QueryIterator qIter, TaskListener<? super QueryIteratorTask> listener) {
+    /**
+     * Create a new QueryIteratorTask.
+     *
+     * @param query the query being executed
+     * @param qIter the base query iterator
+     * @param listener listener for state change events
+     */
+    public QueryIteratorTask(
+            Query query, QueryIterator qIter, TaskListener<? super QueryIteratorTask> listener) {
         super(qIter);
-        taskInfo = new BasicTaskInfoImpl<>(this, () -> Objects.toString(query), Instant.now(), listener);
+        taskInfo =
+                new BasicTaskInfoImpl<>(this, () -> Objects.toString(query), Instant.now(), listener);
         taskInfo.transition(TaskState.STARTING, null);
         taskInfo.transition(TaskState.RUNNING, null);
     }

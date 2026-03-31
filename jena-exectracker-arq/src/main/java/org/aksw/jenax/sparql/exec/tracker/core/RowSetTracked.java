@@ -24,23 +24,32 @@ package org.aksw.jenax.sparql.exec.tracker.core;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
-
 import org.apache.jena.riot.rowset.RowSetWrapper;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.binding.Binding;
 import org.apache.jena.sparql.exec.RowSet;
 
-/** RowSetWrapper that tracks any encountered exceptions in the provided tracker. */
-public class RowSetTracked
-    extends RowSetWrapper
-{
+/** RowSet wrapper that tracks any encountered exceptions in the provided tracker. */
+public class RowSetTracked extends RowSetWrapper {
+    /** Exception tracker that receives reported throwables for exception tracking. */
     protected ThrowableTracker tracker;
 
+    /**
+     * Create a new RowSetTracked.
+     *
+     * @param other the delegate RowSet
+     * @param tracker the exception tracker
+     */
     public RowSetTracked(RowSet other, ThrowableTracker tracker) {
         super(other);
         this.tracker = Objects.requireNonNull(tracker);
     }
 
+    /**
+     * Get the exception tracker.
+     *
+     * @return exception tracker
+     */
     public ThrowableTracker getTracker() {
         return tracker;
     }

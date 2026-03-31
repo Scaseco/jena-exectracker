@@ -3,9 +3,16 @@ package org.aksw.jena.exectracker.arq.plugin;
 import org.apache.jena.sparql.modify.UpdateEngine;
 import org.apache.jena.sparql.modify.UpdateSink;
 
-public interface UpdateEngineWrapper
-    extends UpdateEngine
-{
+/**
+ * UpdateEngineWrapper - Wrapper interface for UpdateEngine that delegates to an underlying
+ * instance.
+ */
+public interface UpdateEngineWrapper extends UpdateEngine {
+    /**
+     * Get the underlying delegate UpdateEngine.
+     *
+     * @return the delegate
+     */
     UpdateEngine getDelegate();
 
     @Override

@@ -24,10 +24,9 @@ package org.aksw.jenax.sparql.exec.tracker.system;
 import org.apache.jena.sparql.engine.iterator.Abortable;
 
 /**
- * Interface for tasks that can execute once - i.e. not periodic ones.
- * Combines task information with cancellation.
+ * Interface for tasks that can execute once - i.e. not periodic ones. Combines task information
+ * with cancellation.
  */
 public interface BasicTaskExec
-    extends BasicTaskInfo, Abortable // XXX Abortable is in iterator package - not ideal.
-{
-}
+        extends BasicTaskInfo, Abortable // XXX Abortable is in iterator package - not ideal.
+{}

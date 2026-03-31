@@ -23,10 +23,18 @@ package org.aksw.jenax.sparql.exec.tracker.unused;
 
 import org.apache.jena.sparql.exec.UpdateExec;
 
-public class UpdateExecWrapper<T extends UpdateExec>
-    extends UpdateProcessorWrapper<T>
-    implements UpdateExec
-{
+/**
+ * UpdateExecWrapper - Wrapper for UpdateExec that delegates to an underlying instance.
+ *
+ * @param <T> the delegate UpdateExec type
+ */
+public class UpdateExecWrapper<T extends UpdateExec> extends UpdateProcessorWrapper<T>
+        implements UpdateExec {
+    /**
+     * Create a new UpdateExecWrapper.
+     *
+     * @param delegate the delegate UpdateExec
+     */
     public UpdateExecWrapper(T delegate) {
         super(delegate);
     }

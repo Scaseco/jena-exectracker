@@ -25,12 +25,19 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-/** Throwable tracker that only stores the first encountered exception. */
-public class ThrowableTrackerFirst
-    implements ThrowableTracker
-{
+/** ThrowableTrackerFirst - Tracks only the first throwable reported, ignoring subsequent ones. */
+public class ThrowableTrackerFirst implements ThrowableTracker {
+    /** ThrowableTrackerFirst constructor. */
+    public ThrowableTrackerFirst() {}
+
+    /** The first throwable reported, or null if none. */
     protected Throwable throwable = null;
 
+    /**
+     * Report a throwable, keeping only the first one.
+     *
+     * @param throwable the throwable to report
+     */
     @Override
     public void report(Throwable throwable) {
         if (this.throwable == null) {
@@ -39,6 +46,11 @@ public class ThrowableTrackerFirst
         // Ignore any throwables after the first
     }
 
+    /**
+     * Get an iterator over reported throwables (at most one).
+     *
+     * @return iterator of throwables
+     */
     @Override
     public Iterator<Throwable> getThrowables() {
         return throwable == null ? Collections.emptyIterator() : List.of(throwable).iterator();

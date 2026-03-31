@@ -21,6 +21,16 @@
 
 package org.aksw.jenax.sparql.exec.tracker.system;
 
+/**
+ * Callback interface for task state change events.
+ *
+ * @param <T> the type of task being listened to
+ */
 public interface TaskListener<T extends HasBasicTaskExec> {
+    /**
+     * Called when a task's state changes.
+     *
+     * @param task the task that changed state
+     */
     void onStateChange(T task);
 }

@@ -23,7 +23,6 @@ package org.aksw.jenax.sparql.exec.tracker.system;
 
 import java.util.Iterator;
 import java.util.function.Supplier;
-
 import org.aksw.jenax.sparql.exec.tracker.core.IteratorTracked;
 import org.aksw.jenax.sparql.exec.tracker.core.RowSetTracked;
 import org.aksw.jenax.sparql.exec.tracker.core.ThrowableTracker;
@@ -40,32 +39,51 @@ import org.apache.jena.sparql.exec.RowSet;
 import org.apache.jena.sparql.util.Context;
 
 /**
- * Wrapper for QueryExec that tracks any encountered exception.
- * This is accomplished by wrapping RowSets and Iterators of the underlying QueryExec.
+ * Wrapper for QueryExec that tracks any encountered exception. This is accomplished by wrapping
+ * RowSets and Iterators of the underlying QueryExec.
+ *
+ * @param <T> the delegate QueryExec type
  */
-public abstract class QueryExecTaskBase<T extends QueryExec> implements QueryExec
-{
+public abstract class QueryExecTaskBase<T extends QueryExec> implements QueryExec {
     private T delegate;
     private ThrowableTracker throwableTracker;
     private QueryType queryExecType = null;
 
+    /**
+     * Create a new QueryExecTaskBase.
+     *
+     * @param delegate the delegate QueryExec
+     * @param tracker the exception tracker
+     */
     public QueryExecTaskBase(T delegate, ThrowableTracker tracker) {
         super();
         this.delegate = delegate;
         this.throwableTracker = tracker;
     }
 
+    /**
+     * Get the delegate QueryExec.
+     *
+     * @return delegate QueryExec
+     */
     protected T getDelegate() {
         return delegate;
     }
 
+    /**
+     * Get the exception tracker.
+     *
+     * @return exception tracker
+     */
     protected ThrowableTracker getThrowableTracker() {
         return throwableTracker;
     }
 
     /**
-     * The query type requested for execution.
-     * For example, calling select() sets this type to {@link QueryType#SELECT}.
+     * Get the query type requested for execution. For example, calling select() sets this type to
+     * {@link QueryType#SELECT}.
+     *
+     * @return query type
      */
     public QueryType getQueryExecType() {
         return queryExecType;
@@ -105,13 +123,17 @@ public abstract class QueryExecTaskBase<T extends QueryExec> implements QueryExe
         getDelegate().abort();
     }
 
+    /**
+     * Set the query type before execution.
+     *
+     * @param queryType query type
+     */
     public void beforeExec(QueryType queryType) {
         this.queryExecType = queryType;
     }
 
     /** Note that afterExec is run only on close. */
-    public void afterExec() {
-    }
+    public void afterExec() {}
 
     @Override
     public RowSet select() {
@@ -183,20 +205,41 @@ public abstract class QueryExecTaskBase<T extends QueryExec> implements QueryExe
         return getDelegate().getDataset();
     }
 
+    /**
+     * Wrap a RowSet with RowSetTracked.
+     *
+     * @param base base RowSet
+     * @return wrapped RowSet
+     */
     protected RowSet wrapRowSet(RowSet base) {
         return new RowSetTracked(base, getThrowableTracker());
     }
 
+    /**
+     * Wrap an Iterator with IteratorTracked.
+     *
+     * @param <X> element type
+     * @param base base iterator
+     * @return wrapped iterator
+     */
     protected <X> Iterator<X> wrapIterator(Iterator<X> base) {
         return new IteratorTracked<>(base, getThrowableTracker());
     }
 
+    /**
+     * Execute the supplier with exception tracking.
+     *
+     * @param queryType the query type
+     * @param supplier the supplier to execute
+     * @param <X> the result type
+     * @return the result
+     */
     protected <X> X compute(QueryType queryType, Supplier<X> supplier) {
         beforeExec(queryType);
         try {
             X result = supplier.get();
             return result;
-        } catch(Throwable e) {
+        } catch (Throwable e) {
             e.addSuppressed(new RuntimeException("Error during select()."));
             throwableTracker.report(e);
             throw e;

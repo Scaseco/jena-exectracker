@@ -24,10 +24,27 @@ package org.aksw.jenax.sparql.exec.tracker.core;
 import java.util.Iterator;
 import java.util.Optional;
 
+/** ThrowableTracker - Interface for tracking throwables encountered during execution. */
 public interface ThrowableTracker {
+    /**
+     * Report a throwable that was encountered.
+     *
+     * @param throwable the throwable to report
+     */
     void report(Throwable throwable);
+
+    /**
+     * Get all reported throwables.
+     *
+     * @return iterator of throwables
+     */
     Iterator<Throwable> getThrowables();
 
+    /**
+     * Get the first throwable if any.
+     *
+     * @return optional first throwable
+     */
     default Optional<Throwable> getFirstThrowable() {
         Iterator<Throwable> it = getThrowables();
         Throwable throwable = it.hasNext() ? it.next() : null;

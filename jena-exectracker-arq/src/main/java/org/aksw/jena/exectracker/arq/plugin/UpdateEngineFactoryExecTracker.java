@@ -7,9 +7,21 @@ import org.apache.jena.sparql.modify.UpdateEngineFactory;
 import org.apache.jena.sparql.modify.UpdateEngineRegistry;
 import org.apache.jena.sparql.util.Context;
 
-public class UpdateEngineFactoryExecTracker
-    implements UpdateEngineFactory
-{
+/**
+ * UpdateEngineFactoryExecTracker - Factory for SPARQL update execution with tracking
+ * instrumentation.
+ */
+public class UpdateEngineFactoryExecTracker implements UpdateEngineFactory {
+    /** Constructor that creates a new UpdateEngineFactoryExecTracker instance. */
+    public UpdateEngineFactoryExecTracker() {}
+
+    /**
+     * Check if this factory can handle the given update execution request.
+     *
+     * @param dataset the dataset to update
+     * @param context the execution context
+     * @return true if this factory accepts the request
+     */
     @Override
     public boolean accept(DatasetGraph dataset, Context context) {
         if (context.isTrue(ExecTrackerConstants.symIsVisited)) {
@@ -22,6 +34,13 @@ public class UpdateEngineFactoryExecTracker
         return isAccepted;
     }
 
+    /**
+     * Create an UpdateEngine with tracking instrumentation.
+     *
+     * @param dataset dataset graph
+     * @param context execution context
+     * @return the update engine
+     */
     @Override
     public UpdateEngine create(DatasetGraph dataset, Context context) {
         context.setTrue(ExecTrackerConstants.symIsVisited);
@@ -30,9 +49,8 @@ public class UpdateEngineFactoryExecTracker
         context.unset(ExecTrackerConstants.symIsVisited);
 
         TaskEventBroker broker = TaskEventBroker.get(context);
-        UpdateEngine result = (broker == null)
-            ? baseEngine
-            : new UpdateEngineExecTracker(baseEngine, context, broker);
+        UpdateEngine result =
+                (broker == null) ? baseEngine : new UpdateEngineExecTracker(baseEngine, context, broker);
         return result;
     }
 }

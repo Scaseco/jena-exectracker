@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
 import org.aksw.jenax.sparql.exec.tracker.system.TaskEventBroker;
 import org.aksw.jenax.sparql.exec.tracker.system.TaskEventHistory;
 import org.apache.jena.fuseki.Fuseki;
@@ -39,17 +38,27 @@ import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.util.Context;
 import org.apache.jena.sparql.util.Symbol;
 
+/** FMod_ExecTracker - Fuseki module for execution tracking integration. */
 public class FMod_ExecTracker implements FusekiAutoModule {
+    /** Namespace constant. */
     public static final String NS = "https://w3id.org/aksw/jena/exectracker/fuseki#";
+
+    /** Symbol constant. */
     public static final Symbol symAllowAbort = Symbol.create(NS + "allowAbort");
 
-    private static final Operation OPERATION = Operation.alloc(
-            NS + "exectracker", "ExecTracker", "Execution Tracker");
+    private static final Operation OPERATION =
+            Operation.alloc(NS + "exectracker", "ExecTracker", "Execution Tracker");
 
+    /**
+     * Get the ExecTracker operation.
+     *
+     * @return the operation
+     */
     public static Operation getOperation() {
         return OPERATION;
     }
 
+    /** Constructor that creates a new FMod_ExecTracker instance. */
     public FMod_ExecTracker() {
         super();
     }
@@ -66,11 +75,10 @@ public class FMod_ExecTracker implements FusekiAutoModule {
         builder.registerOperation(trackerOperation, new ExecTrackerService());
     }
 
-    /**
-     * For each dataset with a 'tracker' endpoint set up a task event broker.
-     */
+    /** For each dataset with a 'tracker' endpoint set up a task event broker. */
     @Override
-    public void configured(FusekiServer.Builder serverBuilder, DataAccessPointRegistry dapRegistry, Model configModel) {
+    public void configured(
+            FusekiServer.Builder serverBuilder, DataAccessPointRegistry dapRegistry, Model configModel) {
         FusekiAutoModule.super.configured(serverBuilder, dapRegistry, configModel);
 
         Operation trackerOperation = getOperation();
@@ -79,7 +87,8 @@ public class FMod_ExecTracker implements FusekiAutoModule {
             DataService dataService = dap.getDataService();
             DatasetGraph dsg = dataService.getDataset();
 
-            List<Endpoint> trackerEndpoints = Optional.ofNullable(dataService.getEndpoints(trackerOperation)).orElse(List.of());
+            List<Endpoint> trackerEndpoints =
+                    Optional.ofNullable(dataService.getEndpoints(trackerOperation)).orElse(List.of());
 
             if (!trackerEndpoints.isEmpty()) {
                 // Register a task tracker registry in the dataset context.
@@ -94,8 +103,10 @@ public class FMod_ExecTracker implements FusekiAutoModule {
                         Context endpointCxt = endpoint.getContext();
                         if (endpointCxt == null) {
                             // XXX Could we set up our own endpoint copy that ensures a non-null context?
-                            throw new FusekiConfigException(endpointLabel + ": Cannot register exec tracker because context is null. "
-                                    + "Try adding an empty context to your cofiguration: <your-service> fuseki:endpoint [ ja:context [ ] ] .");
+                            throw new FusekiConfigException(
+                                    endpointLabel
+                                            + ": Cannot register exec tracker because context is null. "
+                                            + "Try adding an empty context to your cofiguration: <your-service> fuseki:endpoint [ ja:context [ ] ] .");
                         }
 
                         TaskEventHistory historyTracker = TaskEventHistory.getOrCreate(endpointCxt);
@@ -109,10 +120,11 @@ public class FMod_ExecTracker implements FusekiAutoModule {
         }
 
         // "replace" each DataAccessPoint
-        newDataAccessPoints.forEach(dap -> {
-            dapRegistry.remove(dap.getName());
-            dapRegistry.register(dap);
-        });
+        newDataAccessPoints.forEach(
+                dap -> {
+                    dapRegistry.remove(dap.getName());
+                    dapRegistry.register(dap);
+                });
     }
 
     @Override

@@ -24,35 +24,40 @@ package org.aksw.jenax.sparql.exec.tracker.system;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.jena.sparql.SystemARQ;
 import org.apache.jena.sparql.core.DatasetGraph;
-import org.apache.jena.sparql.exec.QueryExec;
-import org.apache.jena.sparql.exec.UpdateExec;
 import org.apache.jena.sparql.util.Context;
 import org.apache.jena.sparql.util.Symbol;
 
 /**
- * A broker that is both sink and source for task events.
+ * TaskEventBroker - A broker that acts as both sink and source for task state change events.
  *
- * A broker can connect to other ones
- * using {@link #connect(TaskEventBroker)} and disconnect from
- * them all using {@link #disconnectFromAll()}.
+ * <p>A broker can connect to other brokers using {@link #connect(TaskEventBroker)} and disconnect
+ * from them all using {@link #disconnectFromAll()}.
  */
-public class TaskEventBroker
-    extends TaskEventSource
-    implements TaskListener<HasBasicTaskExec>
-{
+public class TaskEventBroker extends TaskEventSource implements TaskListener<HasBasicTaskExec> {
+    /** Constructor that creates a new TaskEventBroker instance. */
+    public TaskEventBroker() {}
+
     private Map<TaskListener<?>, Runnable> upstreamRegistrations = new ConcurrentHashMap<>();
 
+    /**
+     * Connect to an upstream TaskEventBroker.
+     *
+     * @param upstream the upstream broker
+     * @return a runnable to unregister the connection
+     */
     public Runnable connect(TaskEventBroker upstream) {
         Runnable unregisterFromBase = upstream.addListener(HasBasicTaskExec.class, this);
-        Runnable unregisterFromThis = upstreamRegistrations.computeIfAbsent(upstream, u -> {
-            return () -> {
-                unregisterFromBase.run();
-                upstreamRegistrations.remove(upstream);
-            };
-        });
+        Runnable unregisterFromThis =
+                upstreamRegistrations.computeIfAbsent(
+                        upstream,
+                        u -> {
+                            return () -> {
+                                unregisterFromBase.run();
+                                upstreamRegistrations.remove(upstream);
+                            };
+                        });
         return unregisterFromThis;
     }
 
@@ -61,73 +66,104 @@ public class TaskEventBroker
         advertiseStateChange(task);
     }
 
+    /** Disconnect from all upstream TaskEventBrokers. */
     public void disconnectFromAll() {
         upstreamRegistrations.values().forEach(Runnable::run);
     }
 
-//    public static QueryExec track(QueryExec queryExec) {
-//        Context cxt = queryExec.getContext();
-//        return track(cxt, queryExec);
-//    }
-//
+    //    public static QueryExec track(QueryExec queryExec) {
+    //        Context cxt = queryExec.getContext();
+    //        return track(cxt, queryExec);
+    //    }
+    //
     /**
-     * If there is a taskTracker in the context then return a {@link QueryExecTask}.
-     * Otherwise return the provided query exec.
+     * If there is a taskTracker in the context then return a {@link QueryExecTaskBase}. Otherwise
+     * return the provided query exec.
      */
-//    public static <T extends HasBasicTaskExec> track(Context cxt, T queryExec) {
-//        TaskEventBroker registry = get(cxt);
-//        HasBasicTaskExec result = (registry == null)
-//            ? queryExec
-//            : QueryExecTask.create(queryExec, registry);
-//        return result;
-//    }
+    //    public static <T extends HasBasicTaskExec> track(Context cxt, T queryExec) {
+    //        TaskEventBroker registry = get(cxt);
+    //        HasBasicTaskExec result = (registry == null)
+    //            ? queryExec
+    //            : QueryExecTask.create(queryExec, registry);
+    //        return result;
+    //    }
 
-//    public static UpdateExec track(UpdateExec updateExec) {
-//        Context cxt = updateExec.getContext();
-//        return track(cxt, updateExec);
-//    }
+    //    public static UpdateExec track(UpdateExec updateExec) {
+    //        Context cxt = updateExec.getContext();
+    //        return track(cxt, updateExec);
+    //    }
 
     /**
-     * If there is a taskTracker in the context then return a {@link QueryExecTask}.
-     * Otherwise return the provided query exec.
+     * If there is a taskTracker in the context then return a {@link QueryExecTaskBase}. Otherwise
+     * return the provided query exec.
      */
-//    public static UpdateExec track(Context cxt, UpdateExec updateExec) {
-//        TaskEventBroker registry = get(cxt);
-//        return track(registry, updateExec);
-//    }
-//
-//    public static UpdateExec track(TaskEventBroker tracker, UpdateExec updateExec) {
-//        UpdateExec result = (tracker == null)
-//            ? updateExec
-//            : UpdateExecTask.create(updateExec, tracker);
-//        return result;
-//    }
+    //    public static UpdateExec track(Context cxt, UpdateExec updateExec) {
+    //        TaskEventBroker registry = get(cxt);
+    //        return track(registry, updateExec);
+    //    }
+    //
+    //    public static UpdateExec track(TaskEventBroker tracker, UpdateExec updateExec) {
+    //        UpdateExec result = (tracker == null)
+    //            ? updateExec
+    //            : UpdateExecTask.create(updateExec, tracker);
+    //        return result;
+    //    }
 
     // ----- ARQ Integration -----
 
+    /** Symbol for TaskEventBroker in context. */
     public static final Symbol symTaskEventBroker = SystemARQ.allocSymbol("taskEventBroker");
 
+    /**
+     * Get TaskEventBroker from dataset graph context.
+     *
+     * @param dsg the dataset graph
+     * @return TaskEventBroker, or null if not registered
+     */
     public static TaskEventBroker get(DatasetGraph dsg) {
         return dsg == null ? null : get(dsg.getContext());
     }
 
+    /**
+     * Get TaskEventBroker from context.
+     *
+     * @param context the context
+     * @return TaskEventBroker, or null if not registered
+     */
     public static TaskEventBroker get(Context context) {
         return context == null ? null : context.get(symTaskEventBroker);
     }
 
+    /**
+     * Remove TaskEventBroker from context.
+     *
+     * @param context the context
+     */
     public static void remove(Context context) {
         if (context != null) {
             context.remove(symTaskEventBroker);
         }
     }
 
-    /** Get an existing TaskEventBroker or atomically create a new one. */
+    /**
+     * Get or create TaskEventBroker in context.
+     *
+     * @param context the context
+     * @return TaskEventBroker
+     */
     public static TaskEventBroker getOrCreate(Context context) {
-        TaskEventBroker result = context.computeIfAbsent(symTaskEventBroker, sym -> new TaskEventBroker());
+        TaskEventBroker result =
+                context.computeIfAbsent(symTaskEventBroker, sym -> new TaskEventBroker());
         return result;
     }
 
-    /** Get an existing TaskEventBroker or fail with a {@link NoSuchElementException}. */
+    /**
+     * Get TaskEventBroker from context or throw exception.
+     *
+     * @param context the context
+     * @return TaskEventBroker
+     * @throws NoSuchElementException if not registered
+     */
     public static TaskEventBroker require(Context context) {
         TaskEventBroker result = get(context);
         if (result == null) {

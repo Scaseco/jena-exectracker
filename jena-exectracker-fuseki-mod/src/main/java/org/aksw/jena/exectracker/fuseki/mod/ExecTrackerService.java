@@ -18,6 +18,15 @@
 
 package org.aksw.jena.exectracker.fuseki.mod;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.internal.bind.JsonTreeWriter;
+import com.google.gson.stream.JsonWriter;
+import jakarta.servlet.AsyncContext;
+import jakarta.servlet.AsyncEvent;
+import jakarta.servlet.AsyncListener;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -32,12 +41,6 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.internal.bind.JsonTreeWriter;
-import com.google.gson.stream.JsonWriter;
-
 import org.aksw.jenax.sparql.exec.tracker.system.HasBasicTaskExec;
 import org.aksw.jenax.sparql.exec.tracker.system.TaskEventHistory;
 import org.aksw.jenax.sparql.exec.tracker.system.TaskListener;
@@ -52,15 +55,7 @@ import org.apache.jena.web.HttpSC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.servlet.AsyncContext;
-import jakarta.servlet.AsyncEvent;
-import jakarta.servlet.AsyncListener;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
-/**
- * REST action handler for listing running query executions and stopping them.
- */
+/** ExecTrackerService - REST handler for execution tracking operations. */
 public class ExecTrackerService extends BaseActionREST {
     private static final Logger logger = LoggerFactory.getLogger(ExecTrackerService.class);
 
@@ -76,19 +71,23 @@ public class ExecTrackerService extends BaseActionREST {
         // The endpoint of the clients.
         Endpoint endpoint;
 
-        // Single listener on an TaskTrackerRegistry. - Not needed here; this listener initialized during FMOD init.
+        // Single listener on an TaskTrackerRegistry. - Not needed here; this listener initialized
+        // during FMOD init.
         Runnable taskTrackerListenerDisposer;
 
         // Web clients on the ExecTracker.
-        Map<AsyncContext, Runnable> eventListeners = Collections.synchronizedMap(new IdentityHashMap<>()); // new ConcurrentHashMap<>();
+        Map<AsyncContext, Runnable> eventListeners =
+                Collections.synchronizedMap(new IdentityHashMap<>()); // new ConcurrentHashMap<>();
 
         // The history tracker connected to the taskTracker.
         // TaskEventHistory historyTracker;
     }
 
     /** Registered clients listening to server side events for indexer status updates. */
-    private Map<TaskEventHistory, Clients> trackerToClients = new ConcurrentHashMap<>(); // Collections.synchronizedMap(new IdentityHashMap<>());
+    private Map<TaskEventHistory, Clients> trackerToClients =
+            new ConcurrentHashMap<>(); // Collections.synchronizedMap(new IdentityHashMap<>());
 
+    /** Constructor that creates a new ExecTrackerService instance. */
     public ExecTrackerService() {}
 
     private static long getExecId(HttpAction action) {
@@ -99,33 +98,46 @@ public class ExecTrackerService extends BaseActionREST {
     }
 
     /**
-     * The GET command can serve: the website, the notification stream from task execution
-     * and the latest task execution status.
+     * The GET command can serve: the website, the notification stream from task execution and the
+     * latest task execution status.
      */
     @Override
     protected void doGet(HttpAction action) {
         String rawCommand = action.getRequestParameter("command");
         String command = Optional.ofNullable(rawCommand).orElse("page");
         switch (command) {
-        case "page": servePage(action); break;
-        case "events": serveEvents(action); break;
-        default:
-            throw new UnsupportedOperationException("Unsupported operation: " + command);
+            case "page":
+                servePage(action);
+                break;
+            case "events":
+                serveEvents(action);
+                break;
+            default:
+                throw new UnsupportedOperationException("Unsupported operation: " + command);
         }
     }
 
-   @Override
-   protected void doPost(HttpAction action) {
-       String command = action.getRequestParameter("command");
-       Objects.requireNonNull(command, "Request parameter 'command' required.");
-       switch (command) {
-       case "status": serveStatus(action); break;
-       case "stop": stopExec(action); break;
-       default:
-           throw new UnsupportedOperationException("Unsupported operation: " + command);
-       }
-   }
+    @Override
+    protected void doPost(HttpAction action) {
+        String command = action.getRequestParameter("command");
+        Objects.requireNonNull(command, "Request parameter 'command' required.");
+        switch (command) {
+            case "status":
+                serveStatus(action);
+                break;
+            case "stop":
+                stopExec(action);
+                break;
+            default:
+                throw new UnsupportedOperationException("Unsupported operation: " + command);
+        }
+    }
 
+    /**
+     * Stop execution by request ID.
+     *
+     * @param action HTTP action
+     */
     protected void stopExec(HttpAction action) {
         checkIsAbortAllowed(action);
 
@@ -148,47 +160,86 @@ public class ExecTrackerService extends BaseActionREST {
         respond(action, HttpSC.OK_200, WebContent.contentTypeTextPlain, "Abort request accepted.");
     }
 
+    /**
+     * Serve the ExecTracker web UI page.
+     *
+     * @param action HTTP action
+     */
     protected void servePage(HttpAction action) {
         // Serves the minimal ExecTracker Web UI.
         String resourceName = "exectracker/index.html";
         String str = null;
-        try (InputStream in = ExecTrackerService.class.getClassLoader().getResourceAsStream(resourceName)) {
+        try (InputStream in =
+                ExecTrackerService.class.getClassLoader().getResourceAsStream(resourceName)) {
             str = IOUtils.toString(in, StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new FusekiException(e);
         }
 
         if (str == null) {
-            respond(action, HttpSC.INTERNAL_SERVER_ERROR_500, WebContent.contentTypeTextPlain,
-                "Failed to load classpath resource " + resourceName);
+            respond(
+                    action,
+                    HttpSC.INTERNAL_SERVER_ERROR_500,
+                    WebContent.contentTypeTextPlain,
+                    "Failed to load classpath resource " + resourceName);
         } else {
             respond(action, HttpSC.OK_200, WebContent.contentTypeHTML, str);
         }
     }
 
+    /**
+     * Get TaskEventHistory from endpoint context.
+     *
+     * @param action HTTP action
+     * @return the task event history
+     */
     protected TaskEventHistory requireTaskEventHistory(HttpAction action) {
         Context cxt = action.getEndpoint().getContext();
         TaskEventHistory taskEventHistory = TaskEventHistory.require(cxt);
         return taskEventHistory;
     }
 
+    /**
+     * Register task event listener for a client session.
+     *
+     * @param taskEventHistory task event history
+     * @param clients client session
+     * @return runnable to dispose listener
+     */
     protected Runnable registerTaskEventListener(TaskEventHistory taskEventHistory, Clients clients) {
         // Register the SSE handler to the history tracker
         InternalListener listener = new InternalListener(taskEventHistory, clients);
-        Runnable disposeTaskEventListener = taskEventHistory.addListener(HasBasicTaskExec.class, listener);
+        Runnable disposeTaskEventListener =
+                taskEventHistory.addListener(HasBasicTaskExec.class, listener);
         return disposeTaskEventListener;
     }
 
+    /** InternalListener - SSE event listener for task state changes. */
     protected class InternalListener implements TaskListener<HasBasicTaskExec> {
+        /** Task event history instance. */
         protected TaskEventHistory taskEvenHistory;
+
+        /** Client session. */
         protected Clients clients;
 
+        /**
+         * Get task serial ID.
+         *
+         * @param task task instance
+         * @return serial ID, or null if not found
+         */
         Long getTaskId(HasBasicTaskExec task) {
             long taskId = taskEvenHistory.getId(task);
             Long serialId = taskEvenHistory.getSerialId(taskId);
             return serialId;
         }
 
+        /**
+         * Create a new InternalListener.
+         *
+         * @param taskEventHistory task event history
+         * @param clients client session
+         */
         public InternalListener(TaskEventHistory taskEventHistory, Clients clients) {
             super();
             this.taskEvenHistory = taskEventHistory;
@@ -198,12 +249,21 @@ public class ExecTrackerService extends BaseActionREST {
         @Override
         public void onStateChange(HasBasicTaskExec task) {
             switch (task.getTaskInfo().getTaskState()) {
-            case STARTING: onStart(task); break;
-            case TERMINATED: onTerminated(task); break;
-            default: // ignored
+                case STARTING:
+                    onStart(task);
+                    break;
+                case TERMINATED:
+                    onTerminated(task);
+                    break;
+                default: // ignored
             }
         }
 
+        /**
+         * Handle task start event by broadcasting to registered clients.
+         *
+         * @param startRecord start record
+         */
         public void onStart(HasBasicTaskExec startRecord) {
             Long serialId = getTaskId(startRecord);
             if (serialId != null) {
@@ -214,7 +274,8 @@ public class ExecTrackerService extends BaseActionREST {
                     writer.endObject();
                     JsonElement json = writer.get();
                     synchronized (clients.listenerLock) {
-                        Iterator<Entry<AsyncContext, Runnable>> it = clients.eventListeners.entrySet().iterator();
+                        Iterator<Entry<AsyncContext, Runnable>> it =
+                                clients.eventListeners.entrySet().iterator();
                         broadcastJson(it, json);
                     }
                 } catch (IOException e) {
@@ -223,6 +284,11 @@ public class ExecTrackerService extends BaseActionREST {
             }
         }
 
+        /**
+         * Handle task termination event by broadcasting to registered clients.
+         *
+         * @param endRecord end record
+         */
         public void onTerminated(HasBasicTaskExec endRecord) {
             Long serialId = getTaskId(endRecord);
             if (serialId != null) {
@@ -230,7 +296,8 @@ public class ExecTrackerService extends BaseActionREST {
                     TaskStatusWriter.writeCompletionRecordObject(writer, serialId, endRecord);
                     JsonElement json = writer.get();
                     synchronized (clients.listenerLock) {
-                        Iterator<Entry<AsyncContext, Runnable>> it = clients.eventListeners.entrySet().iterator();
+                        Iterator<Entry<AsyncContext, Runnable>> it =
+                                clients.eventListeners.entrySet().iterator();
                         broadcastJson(it, json);
                     }
                 } catch (IOException e) {
@@ -239,6 +306,12 @@ public class ExecTrackerService extends BaseActionREST {
             }
         }
     }
+
+    /**
+     * Serve server-side events (SSE) stream to registered clients.
+     *
+     * @param action HTTP action
+     */
     protected void serveEvents(HttpAction action) {
         HttpServletRequest request = action.getRequest();
         HttpServletResponse response = action.getResponse();
@@ -256,81 +329,110 @@ public class ExecTrackerService extends BaseActionREST {
         Runnable[] disposeSseListener = {null};
 
         // Detect when client disconnects
-        asyncContext.addListener(new AsyncListener() {
-            @Override
-            public void onComplete(AsyncEvent event) {
-                disposeSseListener[0].run();
-            }
-
-            @Override
-            public void onTimeout(AsyncEvent event) {
-                disposeSseListener[0].run();
-            }
-
-            @Override
-            public void onError(AsyncEvent event) {
-                disposeSseListener[0].run();
-            }
-
-            @Override
-            public void onStartAsync(AsyncEvent event) {
-                // No-op
-            }
-        });
-
-        disposeSseListener[0] = () -> {
-            trackerToClients.compute(taskTracker, (et, clts) -> {
-                Clients r = clts;
-                if (clts != null) {
-                    synchronized (clts.listenerLock) {
-                        // Remove the listener for the async context.
-                        clts.eventListeners.remove(asyncContext);
-
-                        // If no more listeners remain then dispose the exec tracker listener.
-                        if (clts.eventListeners.isEmpty()) {
-                            clts.taskTrackerListenerDisposer.run();
-                            r = null;
-                        }
+        asyncContext.addListener(
+                new AsyncListener() {
+                    @Override
+                    public void onComplete(AsyncEvent event) {
+                        disposeSseListener[0].run();
                     }
-                }
-                return r;
-            });
-        };
+
+                    @Override
+                    public void onTimeout(AsyncEvent event) {
+                        disposeSseListener[0].run();
+                    }
+
+                    @Override
+                    public void onError(AsyncEvent event) {
+                        disposeSseListener[0].run();
+                    }
+
+                    @Override
+                    public void onStartAsync(AsyncEvent event) {
+                        // No-op
+                    }
+                });
+
+        disposeSseListener[0] =
+                () -> {
+                    trackerToClients.compute(
+                            taskTracker,
+                            (et, clts) -> {
+                                Clients r = clts;
+                                if (clts != null) {
+                                    synchronized (clts.listenerLock) {
+                                        // Remove the listener for the async context.
+                                        clts.eventListeners.remove(asyncContext);
+
+                                        // If no more listeners remain then dispose the exec tracker listener.
+                                        if (clts.eventListeners.isEmpty()) {
+                                            clts.taskTrackerListenerDisposer.run();
+                                            r = null;
+                                        }
+                                    }
+                                }
+                                return r;
+                            });
+                };
 
         // Atomically set up the new listener.
-        trackerToClients.compute(taskTracker, (et, clients) -> {
-            if (clients == null) {
-                clients = new Clients();
-                clients.endpoint = endpoint;
-                Runnable disposer = registerTaskEventListener(taskTracker, clients);
-                // clients.eventListeners.put(asyncContext, disposer);
-                clients.taskTrackerListenerDisposer = disposer;
-            }
-            synchronized (clients.listenerLock) {
-                clients.eventListeners.put(asyncContext, disposeSseListener[0]);
-            }
-            return clients;
-        });
+        trackerToClients.compute(
+                taskTracker,
+                (et, clients) -> {
+                    if (clients == null) {
+                        clients = new Clients();
+                        clients.endpoint = endpoint;
+                        Runnable disposer = registerTaskEventListener(taskTracker, clients);
+                        // clients.eventListeners.put(asyncContext, disposer);
+                        clients.taskTrackerListenerDisposer = disposer;
+                    }
+                    synchronized (clients.listenerLock) {
+                        clients.eventListeners.put(asyncContext, disposeSseListener[0]);
+                    }
+                    return clients;
+                });
     }
 
     /** Check whether abort is allowed in the action's endpoint context. */
+    /**
+     * Check whether abort is allowed for the given HTTP action.
+     *
+     * @param action HTTP action
+     * @return true if abort is allowed
+     */
     protected static boolean isAbortAllowed(HttpAction action) {
         Endpoint endpoint = action.getEndpoint();
         return isAbortAllowed(endpoint);
     }
 
     /** Check whether abort is allowed in the endpoint's context. */
+    /**
+     * Check whether abort is allowed for the given endpoint.
+     *
+     * @param endpoint endpoint
+     * @return true if abort is allowed
+     */
     protected static boolean isAbortAllowed(Endpoint endpoint) {
         Context cxt = (endpoint == null) ? null : endpoint.getContext();
         return isAbortAllowed(cxt);
     }
 
     /** Abort of executions is only allowed if explicitly enabled in the context. */
+    /**
+     * Check whether abort is allowed in the given context.
+     *
+     * @param cxt context
+     * @return true if abort is allowed
+     */
     protected static boolean isAbortAllowed(Context cxt) {
         boolean result = (cxt == null) ? false : cxt.isTrue(FMod_ExecTracker.symAllowAbort);
         return result;
     }
 
+    /**
+     * Check if abort is allowed, throw exception if not allowed.
+     *
+     * @param action HTTP action
+     */
     public static void checkIsAbortAllowed(HttpAction action) {
         boolean isAbortAllowed = isAbortAllowed(action);
         if (!isAbortAllowed) {
@@ -338,12 +440,21 @@ public class ExecTrackerService extends BaseActionREST {
         }
     }
 
+    /**
+     * Set whether abort is allowed in context.
+     *
+     * @param cxt context
+     * @param value true to allow abort, false to disallow
+     */
     public static void setAllowAbort(Context cxt, Boolean value) {
         cxt.set(FMod_ExecTracker.symAllowAbort, value);
     }
 
+    /** Serves a JSON object with the running and recently completed tasks. */
     /**
-     * Serves a JSON object with the running and recently completed tasks.
+     * Serve JSON status of running and completed tasks.
+     *
+     * @param action HTTP action
      */
     protected void serveStatus(HttpAction action) {
         boolean isAbortAllowed = isAbortAllowed(action);
@@ -362,6 +473,14 @@ public class ExecTrackerService extends BaseActionREST {
         }
     }
 
+    /**
+     * Send HTTP response with text content.
+     *
+     * @param action HTTP action
+     * @param status HTTP status code
+     * @param contentType response content type
+     * @param value response body
+     */
     public static void respond(HttpAction action, int status, String contentType, String value) {
         action.setResponseStatus(status);
         action.setResponseContentType(contentType);
@@ -373,6 +492,12 @@ public class ExecTrackerService extends BaseActionREST {
         }
     }
 
+    /**
+     * Broadcast JSON data to all registered clients.
+     *
+     * @param it iterator of client sessions
+     * @param jsonData JSON data to broadcast
+     */
     protected void broadcastJson(Iterator<Entry<AsyncContext, Runnable>> it, JsonElement jsonData) {
         String str = gsonForSseEvents.toJson(jsonData);
         broadcastLine(it, str);
@@ -380,7 +505,14 @@ public class ExecTrackerService extends BaseActionREST {
 
     /**
      * Broadcast a payload to all registered listeners.
+     *
      * @param payload A string without newline characters.
+     */
+    /**
+     * Broadcast payload to all registered clients.
+     *
+     * @param it iterator of client sessions
+     * @param payload payload to broadcast
      */
     protected void broadcastLine(Iterator<Entry<AsyncContext, Runnable>> it, String payload) {
         while (it.hasNext()) {

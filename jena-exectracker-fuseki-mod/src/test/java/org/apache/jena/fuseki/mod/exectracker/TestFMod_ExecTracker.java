@@ -18,15 +18,10 @@
 
 package org.apache.jena.fuseki.mod.exectracker;
 
+import io.github.bonigarcia.wdm.WebDriverManager;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.stream.IntStream;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-
 import org.aksw.jena.exectracker.fuseki.mod.ExecTrackerService;
 import org.aksw.jena.exectracker.fuseki.mod.FMod_ExecTracker;
 import org.aksw.jenax.sparql.exec.tracker.system.TaskEventBroker;
@@ -44,6 +39,10 @@ import org.apache.jena.sparql.core.DatasetGraphFactory;
 import org.apache.jena.sparql.graph.GraphFactory;
 import org.apache.jena.sparql.util.Context;
 import org.apache.jena.system.G;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -52,14 +51,12 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
-
 /**
  * Test cases that interact with the spatial indexer web UI via Selenium.
  *
- * This class is currently set to "ignore" because it requires local browser.
- * Although, a headless Chrome should be started automatically,
- * this step turns out to not yet work reliable across all environments.
+ * <p>This class is currently set to "ignore" because it requires local browser. Although, a
+ * headless Chrome should be started automatically, this step turns out to not yet work reliable
+ * across all environments.
  */
 @Disabled
 public class TestFMod_ExecTracker {
@@ -73,8 +70,8 @@ public class TestFMod_ExecTracker {
     static Graph createTestGraph() {
         Graph graph = GraphFactory.createDefaultGraph();
         IntStream.range(0, 1000)
-            .mapToObj(i -> NodeFactory.createURI("http://www.example.org/r" + i))
-            .forEach(node -> graph.add(node, node, node));
+                .mapToObj(i -> NodeFactory.createURI("http://www.example.org/r" + i))
+                .forEach(node -> graph.add(node, node, node));
         return graph;
     }
 
@@ -82,9 +79,9 @@ public class TestFMod_ExecTracker {
     public void setUp() throws IOException {
         dsg = DatasetGraphFactory.create();
         IntStream.range(0, 1000)
-            .mapToObj(i -> NodeFactory.createURI("http://www.example.org/x" + i))
-            .map(n -> Triple.create(n, n, n))
-            .forEach(dsg.getDefaultGraph()::add);
+                .mapToObj(i -> NodeFactory.createURI("http://www.example.org/x" + i))
+                .map(n -> Triple.create(n, n, n))
+                .forEach(dsg.getDefaultGraph()::add);
 
         TaskEventBroker tracker = TaskEventBroker.getOrCreate(dsg.getContext());
         TaskEventHistory history = TaskEventHistory.getOrCreate(dsg.getContext());
@@ -96,19 +93,21 @@ public class TestFMod_ExecTracker {
         Context endpointCxt = Context.create();
         ExecTrackerService.setAllowAbort(endpointCxt, true);
 
-        String[] argv = new String[] { "--empty" };
-        FusekiServer.Builder serverBuilder = FusekiMain.builder(argv)
-            .add("test", dsg)
-            .registerOperation(FMod_ExecTracker.getOperation(), new ExecTrackerService());
-            // XXX Nice-to-have: addEndpoint method with context argument.
-            // .addEndpoint("test", "tracker", FMod_ExecTracker.getOperation(), null, endpointCxt);
+        String[] argv = new String[] {"--empty"};
+        FusekiServer.Builder serverBuilder =
+                FusekiMain.builder(argv)
+                        .add("test", dsg)
+                        .registerOperation(FMod_ExecTracker.getOperation(), new ExecTrackerService());
+        // XXX Nice-to-have: addEndpoint method with context argument.
+        // .addEndpoint("test", "tracker", FMod_ExecTracker.getOperation(), null, endpointCxt);
 
         DataService.Builder dsBuilder = serverBuilder.getDataServiceBuilder("test");
-        Endpoint endpoint = Endpoint.create()
-            .operation(FMod_ExecTracker.getOperation())
-            .endpointName("tracker")
-            .context(endpointCxt)
-            .build();
+        Endpoint endpoint =
+                Endpoint.create()
+                        .operation(FMod_ExecTracker.getOperation())
+                        .endpointName("tracker")
+                        .context(endpointCxt)
+                        .build();
         dsBuilder.addEndpoint(endpoint);
 
         FusekiServer server = serverBuilder.build();
@@ -137,9 +136,10 @@ public class TestFMod_ExecTracker {
     }
 
     /**
-     * Test that first clicks the "apply" button on HTML page to update the spatial index.
-     * Then, the test removes a graph from the dataset and clicks the "clean" button which
-     * should remove all entries from the index for which there is no corresponding graph in the dataset.
+     * Test that first clicks the "apply" button on HTML page to update the spatial index. Then, the
+     * test removes a graph from the dataset and clicks the "clean" button which should remove all
+     * entries from the index for which there is no corresponding graph in the dataset.
+     *
      * @throws InterruptedException
      */
     @Test
@@ -149,8 +149,9 @@ public class TestFMod_ExecTracker {
             WebElement button = driver.findElement(By.id("apply-action"));
             button.click();
             awaitEvent();
-    //        Assert.assertEquals(1, spatialIndex.query(queryEnvelope, Quad.defaultGraphIRI).size());
-    //        Assert.assertEquals(2, spatialIndex.query(queryEnvelope, graphName1).size());
+            //        Assert.assertEquals(1, spatialIndex.query(queryEnvelope,
+            // Quad.defaultGraphIRI).size());
+            //        Assert.assertEquals(2, spatialIndex.query(queryEnvelope, graphName1).size());
             clearLastEvent();
 
             // Remove the named graph and update the index.
@@ -168,10 +169,11 @@ public class TestFMod_ExecTracker {
 
     private void awaitEvent() {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
-        wait.until(d -> {
-            Object status = js.executeScript("return window.lastEvent;");
-            return status != null;
-        });
+        wait.until(
+                d -> {
+                    Object status = js.executeScript("return window.lastEvent;");
+                    return status != null;
+                });
     }
 
     private void clearLastEvent() {

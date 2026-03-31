@@ -18,25 +18,28 @@
 
 package org.aksw.jena.exectracker.fuseki.mod;
 
+import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Map.Entry;
-
-import com.google.gson.stream.JsonWriter;
-
 import org.aksw.jenax.sparql.exec.tracker.system.HasBasicTaskExec;
 import org.aksw.jenax.sparql.exec.tracker.system.TaskEventHistory;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
+/** TaskStatusWriter - Writes execution tracker state as JSON. */
 public class TaskStatusWriter {
 
+    /** Maximum number of history entries to write. */
     protected int maxHistorySize;
+
+    /** Whether abort is allowed. */
     protected boolean allowAbort;
 
     /**
-     * Create a writer for writing out ExecTracker state as JSON.
+     * TaskStatusWriter constructor.
      *
-     * @param maxHistorySize Caps the number of completed tasks to write out.
+     * @param maxHistorySize caps the number of completed tasks to write out
+     * @param allowAbort whether abort is allowed
      */
     public TaskStatusWriter(int maxHistorySize, boolean allowAbort) {
         super();
@@ -44,13 +47,29 @@ public class TaskStatusWriter {
         this.allowAbort = allowAbort;
     }
 
-    public void writeStatusObject(JsonWriter writer, TaskEventHistory execTracker) throws IOException {
+    /**
+     * Write complete status object to JSON writer.
+     *
+     * @param writer JSON writer
+     * @param execTracker task event history
+     * @throws IOException if JSON writing fails
+     */
+    public void writeStatusObject(JsonWriter writer, TaskEventHistory execTracker)
+            throws IOException {
         writer.beginObject();
         writeStatusMembers(writer, execTracker);
         writer.endObject();
     }
 
-    public void writeStatusMembers(JsonWriter writer, TaskEventHistory execTracker) throws IOException {
+    /**
+     * Write status members (running and completed tasks) to JSON writer.
+     *
+     * @param writer JSON writer
+     * @param execTracker task event history
+     * @throws IOException if JSON writing fails
+     */
+    public void writeStatusMembers(JsonWriter writer, TaskEventHistory execTracker)
+            throws IOException {
         writer.name("runningTasks");
         writer.beginArray();
         for (Entry<Long, HasBasicTaskExec> entry : execTracker.getActiveTasks().entrySet()) {
@@ -65,8 +84,8 @@ public class TaskStatusWriter {
 
         writer.name("completedTasks");
         writer.beginArray();
-        Iterable<Entry<Long, HasBasicTaskExec>> recentHistory = () ->
-            execTracker.getHistory().stream().limit(maxHistorySize).iterator();
+        Iterable<Entry<Long, HasBasicTaskExec>> recentHistory =
+                () -> execTracker.getHistory().stream().limit(maxHistorySize).iterator();
         for (Entry<Long, HasBasicTaskExec> entry : recentHistory) {
             long id = entry.getKey();
             HasBasicTaskExec item = entry.getValue();
@@ -75,13 +94,31 @@ public class TaskStatusWriter {
         writer.endArray();
     }
 
-    public static void writeStartRecordObject(JsonWriter writer, Long id, HasBasicTaskExec item) throws IOException {
+    /**
+     * Write start record object to JSON writer.
+     *
+     * @param writer JSON writer
+     * @param id task ID
+     * @param item task item
+     * @throws IOException if JSON writing fails
+     */
+    public static void writeStartRecordObject(JsonWriter writer, Long id, HasBasicTaskExec item)
+            throws IOException {
         writer.beginObject();
         writeStartRecordMembers(writer, id, item);
         writer.endObject();
     }
 
-    public static void writeStartRecordMembers(JsonWriter writer, Long id, HasBasicTaskExec item) throws IOException {
+    /**
+     * Write start record members to JSON writer.
+     *
+     * @param writer JSON writer
+     * @param id task ID
+     * @param item task item
+     * @throws IOException if JSON writing fails
+     */
+    public static void writeStartRecordMembers(JsonWriter writer, Long id, HasBasicTaskExec item)
+            throws IOException {
         writer.name("type");
         writer.value("StartRecord");
 
@@ -96,6 +133,13 @@ public class TaskStatusWriter {
         writer.value(item.getTaskInfo().getStartTime().map(Instant::toEpochMilli).orElse(-1l));
     }
 
+    /**
+     * Write canAbort field to JSON writer.
+     *
+     * @param writer JSON writer
+     * @param canAbort whether task can be aborted
+     * @throws IOException if JSON writing fails
+     */
     public static void writeCanAbort(JsonWriter writer, Boolean canAbort) throws IOException {
         if (canAbort != null) {
             writer.name("canAbort");
@@ -103,26 +147,60 @@ public class TaskStatusWriter {
         }
     }
 
-    public static void writePayloadObject(JsonWriter writer, HasBasicTaskExec item) throws IOException {
+    /**
+     * Write payload object to JSON writer.
+     *
+     * @param writer JSON writer
+     * @param item task item
+     * @throws IOException if JSON writing fails
+     */
+    public static void writePayloadObject(JsonWriter writer, HasBasicTaskExec item)
+            throws IOException {
         writer.beginObject();
         writePayloadMembers(writer, item);
         writer.endObject();
     }
 
-    public static void writePayloadMembers(JsonWriter writer, HasBasicTaskExec item) throws IOException {
+    /**
+     * Write payload members to JSON writer.
+     *
+     * @param writer JSON writer
+     * @param item task item
+     * @throws IOException if JSON writing fails
+     */
+    public static void writePayloadMembers(JsonWriter writer, HasBasicTaskExec item)
+            throws IOException {
         // XXX Change to description
         String label = item.getTaskInfo().getLabel();
         writer.name("label");
         writer.value(label);
     }
 
-    public static void writeCompletionRecordObject(JsonWriter writer, long id, HasBasicTaskExec item) throws IOException {
+    /**
+     * Write completion record object to JSON writer.
+     *
+     * @param writer JSON writer
+     * @param id task ID
+     * @param item task item
+     * @throws IOException if JSON writing fails
+     */
+    public static void writeCompletionRecordObject(JsonWriter writer, long id, HasBasicTaskExec item)
+            throws IOException {
         writer.beginObject();
         writeCompletionRecordMembers(writer, id, item);
         writer.endObject();
     }
 
-    public static void writeCompletionRecordMembers(JsonWriter writer, long id, HasBasicTaskExec item) throws IOException {
+    /**
+     * Write completion record members to JSON writer.
+     *
+     * @param writer JSON writer
+     * @param id task ID
+     * @param item task item
+     * @throws IOException if JSON writing fails
+     */
+    public static void writeCompletionRecordMembers(JsonWriter writer, long id, HasBasicTaskExec item)
+            throws IOException {
         writer.name("type");
         writer.value("CompletionRecord");
 

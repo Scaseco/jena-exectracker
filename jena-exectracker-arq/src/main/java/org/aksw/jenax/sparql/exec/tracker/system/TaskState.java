@@ -21,14 +21,18 @@
 
 package org.aksw.jenax.sparql.exec.tracker.system;
 
+/** TaskState - Enumerates the states in a task's lifecycle. */
 public enum TaskState {
-    /** Task object has been created. */
+    /** Task object has been created but not yet started. */
     CREATED,
 
     /** A method semantically akin to beforeRun() or init() has been called. */
     STARTING,
 
-    /** A method semantically akin to run() has been called. This implies that the beforeRun() method has completed. */
+    /**
+     * A method semantically akin to run() has been called. This implies that the beforeRun() method
+     * has completed.
+     */
     RUNNING,
 
     /** A method semantically akin to afterRun() or close() has been called but not completed yet. */

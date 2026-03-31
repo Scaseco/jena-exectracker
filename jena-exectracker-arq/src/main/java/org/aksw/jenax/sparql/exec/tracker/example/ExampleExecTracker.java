@@ -11,9 +11,20 @@ import org.apache.jena.sparql.exec.RowSetOps;
 import org.apache.jena.sparql.exec.UpdateExec;
 import org.apache.jena.sys.JenaSystem;
 
+/** ExampleExecTracker - Demonstrates SPARQL execution tracking setup and usage. */
 public class ExampleExecTracker {
-    static { JenaSystem.init(); }
+    /** Constructor that creates a new ExampleExecTracker instance. */
+    public ExampleExecTracker() {}
 
+    static {
+        JenaSystem.init();
+    }
+
+    /**
+     * Main entry point demonstrating exec tracker setup and usage.
+     *
+     * @param args command line arguments (not used)
+     */
     public static void main(String[] args) {
         // QueryEngineRegistry.get().add(new QueryEngineFactoryExecTracker());
         // UpdateEngineRegistry.get().add(new UpdateEngineFactoryExecTracker());
@@ -25,7 +36,9 @@ public class ExampleExecTracker {
 
         DatasetGraph dsg = DatasetGraphFactory.create();
 
-        UpdateExec.dataset(dsg).update("PREFIX eg: <http://www.example.org/> INSERT DATA { eg:s eg:p eg:o }").execute();
+        UpdateExec.dataset(dsg)
+                .update("PREFIX eg: <http://www.example.org/> INSERT DATA { eg:s eg:p eg:o }")
+                .execute();
 
         Table table = QueryExec.dataset(dsg).query("SELECT * { ?s ?p ?o }").table();
         RowSetOps.out(table.toRowSet());

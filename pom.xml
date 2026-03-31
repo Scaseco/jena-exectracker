@@ -64,6 +64,9 @@
 
 		<lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
 
+		<spotless-maven-plugin.version>3.4.0</spotless-maven-plugin.version>
+		<google-java-format.version>1.35.0</google-java-format.version>
+
 		<!-- Project Settings -->
 		<maven.compiler.release>21</maven.compiler.release>
 		<file.encoding>UTF-8</file.encoding>
@@ -278,6 +281,37 @@
 				<version>${maven-war-plugin.version}</version>
 				<configuration>
 					<failOnMissingWebXml>false</failOnMissingWebXml>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.diffplug.spotless</groupId>
+				<artifactId>spotless-maven-plugin</artifactId>
+				<version>${spotless-maven-plugin.version}</version>
+				<configuration>
+					<java>
+						<!-- Other steps like imports, etc. -->
+						<googleJavaFormat>
+							<!-- Optional: <version>1.23.0</version> or
+							<style>AOSP</style> -->
+						</googleJavaFormat>
+
+						<!-- Convert 2-space (from Google) → tabs -->
+						<indent>
+							<tabs>true</tabs>
+							<spacesPerTab>2</spacesPerTab>
+						</indent>
+
+						<!-- Convert tabs → 4 spaces -->
+						<indent>
+							<spaces>true</spaces>
+							<spacesPerTab>4</spacesPerTab>
+						</indent>
+
+						<!-- Optional common steps -->
+						<trimTrailingWhitespace />
+						<endWithNewline />
+						<removeUnusedImports />
+					</java>
 				</configuration>
 			</plugin>
 		</plugins>

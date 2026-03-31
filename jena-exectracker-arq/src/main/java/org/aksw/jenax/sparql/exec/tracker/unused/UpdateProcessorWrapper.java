@@ -24,30 +24,54 @@ package org.aksw.jenax.sparql.exec.tracker.unused;
 import org.apache.jena.update.UpdateProcessor;
 import org.apache.jena.update.UpdateRequest;
 
-public class UpdateProcessorWrapper<T extends UpdateProcessor>
-    implements UpdateProcessor
-{
+/**
+ * UpdateProcessorWrapper.
+ *
+ * @param <T> T
+ */
+public class UpdateProcessorWrapper<T extends UpdateProcessor> implements UpdateProcessor {
     private T delegate;
 
+    /**
+     * UpdateProcessorWrapper.
+     *
+     * @param delegate delegate
+     */
     public UpdateProcessorWrapper(T delegate) {
         super();
         this.delegate = delegate;
     }
 
+    /**
+     * getDelegate.
+     *
+     * @return T
+     */
     protected T getDelegate() {
         return delegate;
     }
 
+    /**
+     * getUpdateRequest.
+     *
+     * @return UpdateRequest
+     */
     @Override
     public UpdateRequest getUpdateRequest() {
         return getDelegate().getUpdateRequest();
     }
 
+    /**
+     * getUpdateRequestString.
+     *
+     * @return String
+     */
     @Override
     public String getUpdateRequestString() {
         return getDelegate().getUpdateRequestString();
     }
 
+    /** execute. */
     @Override
     public void execute() {
         getDelegate().execute();

@@ -26,18 +26,25 @@ import java.util.Objects;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-
 import org.apache.jena.atlas.iterator.IteratorWrapper;
 
 /**
- * Iterator wrapper that forwards an encountered exception
- * to a configured destination.
+ * Iterator wrapper that forwards an encountered exception to a configured destination.
+ *
+ * @param <T> the element type
  */
-public class IteratorTracked<T>
-    extends IteratorWrapper<T>
-{
+public class IteratorTracked<T> extends IteratorWrapper<T> {
+    /**
+     * Exception tracker that receives reported throwables for forwarding to a configured destination.
+     */
     protected ThrowableTracker tracker;
 
+    /**
+     * Create a new IteratorTracked.
+     *
+     * @param iterator the base iterator
+     * @param tracker the exception tracker
+     */
     public IteratorTracked(Iterator<T> iterator, ThrowableTracker tracker) {
         super(iterator);
         this.tracker = Objects.requireNonNull(tracker);
@@ -58,6 +65,13 @@ public class IteratorTracked<T>
         trackForEachRemaining(tracker, get(), action);
     }
 
+    /**
+     * Track a boolean operation.
+     *
+     * @param tracker the exception tracker
+     * @param action the boolean supplier
+     * @return the result
+     */
     public static boolean trackBoolean(ThrowableTracker tracker, BooleanSupplier action) {
         try {
             boolean result = action.getAsBoolean();
@@ -69,6 +83,14 @@ public class IteratorTracked<T>
         }
     }
 
+    /**
+     * Track a value operation.
+     *
+     * @param tracker the exception tracker
+     * @param action the value supplier
+     * @param <T> the value type
+     * @return the result
+     */
     public static <T> T track(ThrowableTracker tracker, Supplier<T> action) {
         try {
             T result = action.get();
@@ -80,7 +102,16 @@ public class IteratorTracked<T>
         }
     }
 
-    public static <T> void trackForEachRemaining(ThrowableTracker tracker, Iterator<T> it, Consumer<? super T> action) {
+    /**
+     * Track forEachRemaining operation.
+     *
+     * @param tracker the exception tracker
+     * @param it the iterator
+     * @param action the consumer
+     * @param <T> the element type
+     */
+    public static <T> void trackForEachRemaining(
+            ThrowableTracker tracker, Iterator<T> it, Consumer<? super T> action) {
         try {
             it.forEachRemaining(action);
         } catch (Throwable t) {
