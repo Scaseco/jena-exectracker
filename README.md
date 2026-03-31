@@ -20,7 +20,7 @@ SPARQL Execution Tracking for Apache Jena via interception at `QueryEngineRegist
   </tr>
 </table>
 
-The Fuseki Plugin is published with releases: [Latest Release](/releases).
+The Fuseki Plugin is published with [releases](https://github.com/Scaseco/jena-exectracker/releases/).
 
 A complete example setup is provided in [example-setup-fuseki](example-setup-fuseki).
 
