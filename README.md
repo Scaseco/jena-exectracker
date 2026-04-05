@@ -167,6 +167,16 @@ This project is licensed under the Apache License, Version 2.0. See the [LICENSE
 
 Contributions are welcome! Please read our [contributing guidelines](CONTRIBUTING.md) before opening a pull request.
 
+## Star History
+
+<a href="https://www.star-history.com/?repos=Scaseco%2Fjena-exectracker&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=Scaseco/jena-exectracker&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=Scaseco/jena-exectracker&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=Scaseco/jena-exectracker&type=date&legend=top-left" />
+ </picture>
+</a>
+
 ## Contact
 
 * Issue tracker: https://github.com/Scaseco/jena-exectracker/issues
