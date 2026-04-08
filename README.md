@@ -7,8 +7,10 @@ SPARQL Execution Tracking for Apache Jena via interception at `QueryEngineRegist
 
 ## ⚠️ Limitations
 
-* Only the `SELECT` form of queries can be tracked. This is because `QueryEngineRegistry` operates on a lower level than CONSTRUCT, DESCRIBE and ASK.
-* Update requests are only tracked as generic `# Update Request`. This is because the `UpdateEngineRegistry` only receives notification of update requests, but not the actual statement.
+The tracker will be notified of all query and update execution requests, however there are limitations of what information can be extracted:
+
+* Any query will appear in its `SELECT` form. This is because `QueryEngineRegistry` operates on a lower level than CONSTRUCT, DESCRIBE and ASK.
+* Update requests only appear as generic `# Update Request`. This is because the `UpdateEngineRegistry` only receives notification of update requests, but not the SPARQL statement.
 
 ## Fuseki Plugin
 
