@@ -242,7 +242,7 @@
         <col style="width: auto;">
       </colgroup>
       <thead>
-        <tr><th>ID</th><th>Start Time</th><th>End Time</th><th>Operation</th></tr>
+        <tr><th>ID</th><th>Start Time</th><th>Duration</th><th>Operation</th></tr>
       </thead>
       <tbody></tbody>
     </table>
@@ -381,6 +381,19 @@
       return new Date(ms).toLocaleString();
     }
 
+    function formatDuration(ms) {
+      const d = Math.floor(ms / 86400000);
+      const h = Math.floor((ms % 86400000) / 3600000);
+      const m = Math.floor((ms % 3600000) / 60000);
+      const s = Math.floor((ms % 60000) / 1000);
+      const parts = [];
+      if (d > 0) parts.push(d + 'd');
+      if (h > 0) parts.push(h + 'h');
+      if (m > 0) parts.push(m + 'm');
+      parts.push(s + 's');
+      return parts.join(' ');
+    }
+
     function formatLabel(str) {
       return abbrevString(str, 256);
     }
@@ -451,8 +464,11 @@
         <td>${task.requestId}</td>
         <td>${formatTime(task.timestamp)}</td>
         <td><button onclick="stopTask(${requestId})">Stop</button></td>
-        <td><span class="expandable" onclick="toggleDetails('running-details-${requestId}')">${escapeHtml(label)}</span><button class="copy-btn" data-text="${escapeHtml(details)}" onclick="event.stopPropagation(); copyOperation(this)" title="Copy">⎘</button></td>
+        <td><span class="expandable" onclick="toggleDetails('running-details-${requestId}')">${escapeHtml(label)}</span><button class="copy-btn" onclick="event.stopPropagation(); copyOperation(this)" title="Copy">⎘</button></td>
       `;
+
+      const copyBtn = mainRow.querySelector('.copy-btn');
+      if (copyBtn) copyBtn.setAttribute('data-text', details);
 
       const detailsRow = document.createElement('tr');
       detailsRow.id = `running-details-${requestId}`;
@@ -549,9 +565,12 @@
       mainRow.innerHTML = `
         <td>${record.startRecord.requestId}</td>
         <td>${formatTime(record.startRecord.timestamp)}</td>
-        <td>${formatTime(record.timestamp)}</td>
-        <td><span class="expandable" onclick="toggleDetails('completed-details-${requestId}')">${escapeHtml(label)}</span><button class="copy-btn" data-text="${escapeHtml(details)}" onclick="event.stopPropagation(); copyOperation(this)" title="Copy">⎘</button></td>
+        <td>${formatDuration(record.timestamp - record.startRecord.timestamp)}</td>
+        <td><span class="expandable" onclick="toggleDetails('completed-details-${requestId}')">${escapeHtml(label)}</span><button class="copy-btn" onclick="event.stopPropagation(); copyOperation(this)" title="Copy">⎘</button></td>
       `;
+
+      const copyBtn = mainRow.querySelector('.copy-btn');
+      if (copyBtn) copyBtn.setAttribute('data-text', details);
 
       const detailsRow = document.createElement('tr');
       detailsRow.id = `completed-details-${requestId}`;
