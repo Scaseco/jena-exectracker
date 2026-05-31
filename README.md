@@ -5,6 +5,13 @@
 
 SPARQL Execution Tracking for Apache Jena via interception at `QueryEngineRegistry` and `UpdateEngineRegistry`.
 
+## ⚠️ Limitations
+
+The tracker will be notified of all query and update execution requests, however there are limitations on the information that can be extracted:
+
+* Any query will appear in its `SELECT` form. This is because `QueryEngineRegistry` operates on a lower level than CONSTRUCT, DESCRIBE and ASK.
+* Update requests only appear as generic `# Update Request`. This is because the `UpdateEngineRegistry` only receives notification of update requests, but not the SPARQL statement.
+
 ## Fuseki Plugin
 
 <table>
@@ -20,7 +27,7 @@ SPARQL Execution Tracking for Apache Jena via interception at `QueryEngineRegist
   </tr>
 </table>
 
-The Fuseki Plugin is published with releases: [Latest Release](/releases/latest).
+The Fuseki Plugin is published with [releases](https://github.com/Scaseco/jena-exectracker/releases/).
 
 A complete example setup is provided in [example-setup-fuseki](example-setup-fuseki).
 
@@ -166,6 +173,16 @@ This project is licensed under the Apache License, Version 2.0. See the [LICENSE
 ## Contributing
 
 Contributions are welcome! Please read our [contributing guidelines](CONTRIBUTING.md) before opening a pull request.
+
+## Star History
+
+<a href="https://www.star-history.com/?repos=Scaseco%2Fjena-exectracker&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=Scaseco/jena-exectracker&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=Scaseco/jena-exectracker&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=Scaseco/jena-exectracker&type=date&legend=top-left" />
+ </picture>
+</a>
 
 ## Contact
 

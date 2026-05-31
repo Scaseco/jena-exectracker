@@ -6,6 +6,30 @@
   <title>Execution Tracker</title>
 
   <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Inter", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 0.875rem;
+      line-height: 1.5;
+      color: #1a1a2e;
+      background: #f0f2f5;
+      margin: 0;
+      padding: 1.5rem 2rem;
+    }
+
+    h1 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: #1a1a2e;
+      margin: 0 0 0.75rem 0;
+      padding-bottom: 0.375rem;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
     .controls {
       display: flex;
       box-sizing: border-box;
@@ -13,61 +37,163 @@
       gap: 10px;
       margin-bottom: 20px;
       align-items: center;
-      background: #f8f9fa;
-      padding: 10px;
-      border-radius: 5px;
+      background: #ffffff;
+      padding: 10px 16px;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
     }
 
     .log-info {
-        background-color: #cce5ff;
-        color: #004085;
+        background-color: #dbeafe;
+        color: #1e40af;
+        font-weight: 500;
+    }
+
+    .table-wrapper {
+      margin-bottom: 2rem;
+      max-width: 100%;
+      overflow-x: auto;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
     }
 
     table {
       width: 100%;
+      min-width: 28rem;
       border-collapse: collapse;
-      margin-bottom: 2em;
+      background: #ffffff;
     }
     th, td {
-      padding: 0.5em;
-      border: 1px solid #ccc;
+      padding: 0.625rem 0.75rem;
+      border-bottom: 1px solid #e2e8f0;
       text-align: left;
       overflow-wrap: break-word;
-      vertical-align: top;
+      vertical-align: middle;
+    }
+    th {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #64748b;
+      background: #f8fafc;
+      white-space: nowrap;
     }
     th:nth-child(1), td:nth-child(1) {
-      width: 8em;
-      white-space: nowrap;
+      font-family: "SF Mono", "Cascadia Code", "Fira Code", monospace;
+      font-size: 0.8125rem;
+      color: #64748b;
     }
     th:nth-child(2), td:nth-child(2),
-    th:nth-child(3), td:nth-child(3) {
-      width: 12em;
-      white-space: nowrap;
-    }
+    th:nth-child(3), td:nth-child(3),
     th:nth-child(4), td:nth-child(4) {
-      width: auto;
+      font-size: 0.8125rem;
+      color: #475569;
     }
+
+    tbody tr {
+      transition: background-color 0.15s ease;
+    }
+    tbody tr:nth-child(even) {
+      background: #f8fafc;
+    }
+    tbody tr:nth-child(odd) {
+      background: #ffffff;
+    }
+    tbody tr:hover {
+      background: #f1f5f9;
+    }
+
     .expandable {
       cursor: pointer;
-      color: blue;
+      color: #2563eb;
+      text-decoration: none;
+      display: inline;
+      font-weight: 500;
+      transition: color 0.15s ease;
+    }
+    .expandable:hover {
+      color: #1d4ed8;
       text-decoration: underline;
-      display: block;
     }
+
+    .copy-btn {
+      font-family: inherit;
+      font-size: 0.875rem;
+      padding: 0.125rem 0.375rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
+      background: #f8fafc;
+      color: #94a3b8;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      margin-left: 0.375rem;
+      line-height: 1;
+      vertical-align: middle;
+      opacity: 0;
+    }
+    tr:hover .copy-btn {
+      opacity: 1;
+    }
+    .copy-btn:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+      color: #475569;
+    }
+
+    button {
+      font-family: inherit;
+      font-size: 0.75rem;
+      font-weight: 500;
+      padding: 0.3125rem 0.75rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 5px;
+      background: #ffffff;
+      color: #334155;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    button:hover:not(:disabled) {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      background: #f1f5f9;
+      color: #94a3b8;
+    }
+
     .error {
-      background-color: #fdd;
+      background-color: #fef2f2 !important;
     }
+    .error td {
+      color: #991b1b;
+    }
+    .error td:first-child {
+      color: #ef4444;
+    }
+
     .details-box-row {
       display: none;
-      background-color: #f5f5f5;
+      background-color: #f8fafc;
+    }
+    .details-box-row:hover {
+      background-color: #f1f5f9 !important;
     }
     .details-box {
-      padding: 0.5em;
-      font-family: monospace;
+      padding: 0.625rem 0.75rem;
+      font-family: "SF Mono", "Cascadia Code", "Fira Code", monospace;
+      font-size: 0.75rem;
       text-align: left;
       word-wrap: break-word;
       white-space: pre-wrap;
-      /* border-top: 1px solid #ccc; */
+      border-left: 3px solid #e2e8f0;
+      color: #475569;
+      line-height: 1.6;
     }
+
     .fade-out {
       opacity: 0.2;
       transition: opacity 10s ease;
@@ -91,20 +217,36 @@
   </div>
 
   <h1>Ongoing Executions</h1>
-  <table id="runningTasksTable">
-    <thead>
-      <tr><th>ID</th><th>Start Time</th><th>Label</th><th>Action</th></tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <div class="table-wrapper">
+    <table id="runningTasksTable">
+      <colgroup>
+        <col style="width: 6em; min-width: 6em;">
+        <col style="width: 14em; min-width: 14em;">
+        <col style="width: 14em; min-width: 14em;">
+        <col style="width: auto;">
+      </colgroup>
+      <thead>
+        <tr><th>ID</th><th>Start Time</th><th>Action</th><th>Operation</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
 
   <h1>Completed Executions</h1>
-  <table id="completedTasksTable">
-    <thead>
-      <tr><th>ID</th><th>Start Time</th><th>End Time</th><th>Label</th></tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <div class="table-wrapper">
+    <table id="completedTasksTable">
+      <colgroup>
+        <col style="width: 6em; min-width: 6em;">
+        <col style="width: 14em; min-width: 14em;">
+        <col style="width: 14em; min-width: 14em;">
+        <col style="width: auto;">
+      </colgroup>
+      <thead>
+        <tr><th>ID</th><th>Start Time</th><th>End Time</th><th>Operation</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
 
   <script>
     const apiEndpoint = "";
@@ -252,6 +394,28 @@
       detailsRow.style.display = detailsRow.style.display === 'table-row' ? 'none' : 'table-row';
     }
 
+    function copyOperation(button) {
+      const text = button.getAttribute('data-text');
+      navigator.clipboard.writeText(text).then(() => {
+        const original = button.innerHTML;
+        button.innerHTML = '&#x2713;';
+        button.style.color = '#16a34a';
+        button.style.borderColor = '#16a34a';
+        setTimeout(() => {
+          button.innerHTML = original;
+          button.style.color = '';
+          button.style.borderColor = '';
+        }, 1500);
+      }).catch(() => {
+        const fallback = document.createElement('textarea');
+        fallback.value = text;
+        document.body.appendChild(fallback);
+        fallback.select();
+        document.execCommand('copy');
+        document.body.removeChild(fallback);
+      });
+    }
+
     function renderRunningTasks(tasks) {
       tasks.forEach(task => {
         renderRunningTask(task);
@@ -286,8 +450,8 @@
       mainRow.innerHTML = `
         <td>${task.requestId}</td>
         <td>${formatTime(task.timestamp)}</td>
-        <td><span class="expandable" onclick="toggleDetails('running-details-${requestId}')">${escapeHtml(label)}</span></td>
         <td><button onclick="stopTask(${requestId})">Stop</button></td>
+        <td><span class="expandable" onclick="toggleDetails('running-details-${requestId}')">${escapeHtml(label)}</span><button class="copy-btn" data-text="${escapeHtml(details)}" onclick="event.stopPropagation(); copyOperation(this)" title="Copy">⎘</button></td>
       `;
 
       const detailsRow = document.createElement('tr');
@@ -386,7 +550,7 @@
         <td>${record.startRecord.requestId}</td>
         <td>${formatTime(record.startRecord.timestamp)}</td>
         <td>${formatTime(record.timestamp)}</td>
-        <td><span class="expandable" onclick="toggleDetails('completed-details-${requestId}')">${escapeHtml(label)}</span></td>
+        <td><span class="expandable" onclick="toggleDetails('completed-details-${requestId}')">${escapeHtml(label)}</span><button class="copy-btn" data-text="${escapeHtml(details)}" onclick="event.stopPropagation(); copyOperation(this)" title="Copy">⎘</button></td>
       `;
 
       const detailsRow = document.createElement('tr');
