@@ -117,6 +117,30 @@
       text-decoration: underline;
     }
 
+    .copy-btn {
+      font-family: inherit;
+      font-size: 0.875rem;
+      padding: 0.125rem 0.375rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
+      background: #f8fafc;
+      color: #94a3b8;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      margin-left: 0.375rem;
+      line-height: 1;
+      vertical-align: middle;
+      opacity: 0;
+    }
+    tr:hover .copy-btn {
+      opacity: 1;
+    }
+    .copy-btn:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+      color: #475569;
+    }
+
     button {
       font-family: inherit;
       font-size: 0.75rem;
@@ -218,7 +242,7 @@
         <col style="width: auto;">
       </colgroup>
       <thead>
-        <tr><th>ID</th><th>Start Time</th><th>End Time</th><th>Label</th></tr>
+        <tr><th>ID</th><th>Start Time</th><th>End Time</th><th>Operation</th></tr>
       </thead>
       <tbody></tbody>
     </table>
@@ -370,6 +394,28 @@
       detailsRow.style.display = detailsRow.style.display === 'table-row' ? 'none' : 'table-row';
     }
 
+    function copyOperation(button) {
+      const text = button.getAttribute('data-text');
+      navigator.clipboard.writeText(text).then(() => {
+        const original = button.innerHTML;
+        button.innerHTML = '&#x2713;';
+        button.style.color = '#16a34a';
+        button.style.borderColor = '#16a34a';
+        setTimeout(() => {
+          button.innerHTML = original;
+          button.style.color = '';
+          button.style.borderColor = '';
+        }, 1500);
+      }).catch(() => {
+        const fallback = document.createElement('textarea');
+        fallback.value = text;
+        document.body.appendChild(fallback);
+        fallback.select();
+        document.execCommand('copy');
+        document.body.removeChild(fallback);
+      });
+    }
+
     function renderRunningTasks(tasks) {
       tasks.forEach(task => {
         renderRunningTask(task);
@@ -405,7 +451,7 @@
         <td>${task.requestId}</td>
         <td>${formatTime(task.timestamp)}</td>
         <td><button onclick="stopTask(${requestId})">Stop</button></td>
-        <td><span class="expandable" onclick="toggleDetails('running-details-${requestId}')">${escapeHtml(label)}</span></td>
+        <td><span class="expandable" onclick="toggleDetails('running-details-${requestId}')">${escapeHtml(label)}</span><button class="copy-btn" data-text="${escapeHtml(details)}" onclick="event.stopPropagation(); copyOperation(this)" title="Copy">⎘</button></td>
       `;
 
       const detailsRow = document.createElement('tr');
@@ -504,7 +550,7 @@
         <td>${record.startRecord.requestId}</td>
         <td>${formatTime(record.startRecord.timestamp)}</td>
         <td>${formatTime(record.timestamp)}</td>
-        <td><span class="expandable" onclick="toggleDetails('completed-details-${requestId}')">${escapeHtml(label)}</span></td>
+        <td><span class="expandable" onclick="toggleDetails('completed-details-${requestId}')">${escapeHtml(label)}</span><button class="copy-btn" data-text="${escapeHtml(details)}" onclick="event.stopPropagation(); copyOperation(this)" title="Copy">⎘</button></td>
       `;
 
       const detailsRow = document.createElement('tr');
