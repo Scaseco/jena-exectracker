@@ -6,7 +6,7 @@
 Apache Jena Fuseki plugin that features a dashboard and API to view running and terminated SPARQL query/update executions.
 Permission to cancel executions can be granted via Fuseki's user management.
 The implementation interceps at Jena's `QueryEngineRegistry` and `UpdateEngineRegistry` APIs.
-The execution tracking can also be used programmatically with ARQ (=Jena's query engine).
+The execution tracking can also be used programmatically with ARQ (= Jena's query engine).
 
 ## ⚠️ Limitations
 
