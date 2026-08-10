@@ -18,7 +18,6 @@
 
 package org.aksw.jena.exectracker.fuseki.mod;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -83,7 +82,6 @@ public class FMod_ExecTracker implements FusekiAutoModule {
         FusekiAutoModule.super.configured(serverBuilder, dapRegistry, configModel);
 
         Operation trackerOperation = getOperation();
-        List<DataAccessPoint> newDataAccessPoints = new ArrayList<>();
         for (DataAccessPoint dap : dapRegistry.accessPoints()) {
             DataService dataService = dap.getDataService();
             DatasetGraph dsg = dataService.getDataset();
@@ -111,21 +109,14 @@ public class FMod_ExecTracker implements FusekiAutoModule {
                         }
 
                         TaskEventHistory historyTracker = TaskEventHistory.getOrCreate(endpointCxt);
-                        historyTracker.connect(taskTrackerRegistry);
+                        if (!taskTrackerRegistry.hasListener(historyTracker)) {
+                            historyTracker.connect(taskTrackerRegistry);
+                        }
                         // XXX Should disconnect history tracker on server shutdown.
                     }
                 }
-            } else {
-                newDataAccessPoints.add(dap);
             }
         }
-
-        // "replace" each DataAccessPoint
-        newDataAccessPoints.forEach(
-                dap -> {
-                    dapRegistry.remove(dap.getName());
-                    dapRegistry.register(dap);
-                });
     }
 
     @Override

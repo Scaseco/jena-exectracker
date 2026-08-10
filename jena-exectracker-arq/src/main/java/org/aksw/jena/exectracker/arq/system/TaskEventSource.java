@@ -24,6 +24,7 @@ package org.aksw.jena.exectracker.arq.system;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,6 +60,16 @@ public class TaskEventSource {
                     return new TaskListenerTypeAdapter<>(clz, listener);
                 });
         return () -> listenersByType.remove(listener);
+    }
+
+    /**
+     * Check if the given listener is already registered.
+     *
+     * @param listener the listener to check for whether it is registered.
+     */
+    public boolean hasListener(TaskListener<?> listener) {
+        boolean result = listenersByType.containsKey(listener);
+        return result;
     }
 
     /**

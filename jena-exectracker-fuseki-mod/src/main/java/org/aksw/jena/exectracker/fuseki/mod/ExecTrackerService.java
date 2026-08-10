@@ -249,6 +249,7 @@ public class ExecTrackerService extends BaseActionREST {
 
         @Override
         public void onStateChange(HasBasicTaskExec task) {
+            System.out.println("GOT EVENT; " + task);
             switch (task.getTaskInfo().getTaskState()) {
                 case STARTING:
                     onStart(task);
