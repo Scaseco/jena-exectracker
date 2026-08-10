@@ -18,15 +18,6 @@
 
 package org.aksw.jena.exectracker.fuseki.mod;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.internal.bind.JsonTreeWriter;
-import com.google.gson.stream.JsonWriter;
-import jakarta.servlet.AsyncContext;
-import jakarta.servlet.AsyncEvent;
-import jakarta.servlet.AsyncListener;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -42,6 +33,11 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.internal.bind.JsonTreeWriter;
+import com.google.gson.stream.JsonWriter;
+
 import org.aksw.jena.exectracker.arq.system.HasBasicTaskExec;
 import org.aksw.jena.exectracker.arq.system.TaskEventHistory;
 import org.aksw.jena.exectracker.arq.system.TaskListener;
@@ -55,6 +51,12 @@ import org.apache.jena.sparql.util.Context;
 import org.apache.jena.web.HttpSC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jakarta.servlet.AsyncContext;
+import jakarta.servlet.AsyncEvent;
+import jakarta.servlet.AsyncListener;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /** ExecTrackerService - REST handler for execution tracking operations. */
 public class ExecTrackerService extends BaseActionREST {
@@ -249,7 +251,6 @@ public class ExecTrackerService extends BaseActionREST {
 
         @Override
         public void onStateChange(HasBasicTaskExec task) {
-            System.out.println("GOT EVENT; " + task);
             switch (task.getTaskInfo().getTaskState()) {
                 case STARTING:
                     onStart(task);
