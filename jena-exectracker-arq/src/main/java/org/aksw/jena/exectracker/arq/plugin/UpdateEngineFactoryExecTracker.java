@@ -27,6 +27,12 @@ public class UpdateEngineFactoryExecTracker implements UpdateEngineFactory {
         if (context.isTrue(ExecTrackerConstants.symIsVisited)) {
             return false;
         }
+
+        TaskEventBroker taskEventBroker = TaskEventBroker.get(context);
+        if (taskEventBroker == null) {
+            return false;
+        }
+
         context.setTrue(ExecTrackerConstants.symIsVisited);
         UpdateEngineFactory f = UpdateEngineRegistry.findFactory(dataset, context);
         boolean isAccepted = f.accept(dataset, context);

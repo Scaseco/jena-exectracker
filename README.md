@@ -3,7 +3,10 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![Maven Central](https://img.shields.io/maven-central/v/org.aksw.jena.exectracker/jena-exectracker-parent)](https://mvnrepository.com/artifact/org.aksw.jena.exectracker)
 
-SPARQL Execution Tracking for Apache Jena via interception at `QueryEngineRegistry` and `UpdateEngineRegistry`.
+Apache Jena Fuseki plugin that features a dashboard and API to view running and terminated SPARQL query/update executions.
+Permission to cancel executions can be granted via Fuseki's user management.
+The implementation interceps at Jena's `QueryEngineRegistry` and `UpdateEngineRegistry` APIs.
+The execution tracking can also be used programmatically with ARQ (= Jena's query engine).
 
 ## ⚠️ Limitations
 

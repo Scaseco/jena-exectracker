@@ -2,8 +2,6 @@ package org.aksw.jena.exectracker.arq.plugin;
 
 import java.util.Objects;
 
-import org.aksw.jena.exectracker.arq.core.ThrowableTracker;
-import org.aksw.jena.exectracker.arq.core.ThrowableTrackerFirst;
 import org.aksw.jena.exectracker.arq.system.QueryIteratorTask;
 import org.aksw.jena.exectracker.arq.system.TaskEventBroker;
 import org.apache.jena.query.Query;
@@ -41,6 +39,12 @@ public class QueryEngineFactoryExecTracker implements QueryEngineFactory {
         if (context.isTrue(ExecTrackerConstants.symIsVisited)) {
             return false;
         }
+
+        TaskEventBroker taskEventBroker = TaskEventBroker.get(context);
+        if (taskEventBroker == null) {
+            return false;
+        }
+
         context.setTrue(ExecTrackerConstants.symIsVisited);
         QueryEngineFactory f = QueryEngineRegistry.findFactory(query, dataset, context);
         boolean isAccepted = f.accept(query, dataset, context);
@@ -80,6 +84,12 @@ public class QueryEngineFactoryExecTracker implements QueryEngineFactory {
         if (context.isTrue(ExecTrackerConstants.symIsVisited)) {
             return false;
         }
+
+        TaskEventBroker taskEventBroker = TaskEventBroker.get(context);
+        if (taskEventBroker == null) {
+            return false;
+        }
+
         context.setTrue(ExecTrackerConstants.symIsVisited);
         QueryEngineFactory f = QueryEngineRegistry.findFactory(op, dataset, context);
         boolean isAccepted = f.accept(op, dataset, context);
